@@ -37,6 +37,18 @@ test('admin authentication, same-origin sessions and secret-free responses', asy
   assert.equal(blocked.status,403);
   assert.equal((await req('/admin/plugins','GET',undefined,'none',{Cookie:cookie})).status,200);
 });
+test('admin accepts a short non-empty password', async () => {
+  const previous = process.env.PLUGIN_ADMIN_KEY;
+  process.env.PLUGIN_ADMIN_KEY = 'a';
+  try {
+    const response = await req('/admin/session','POST',{key:'a'},'none');
+    assert.equal(response.status, 200);
+    assert.equal((await req('/admin/plugins','GET',undefined,'none',{Cookie:response.headers.get('set-cookie')!})).status, 200);
+    assert.equal((await req('/admin/session','POST',{key:'b'},'none')).status, 401);
+    process.env.PLUGIN_ADMIN_KEY = 'a'.repeat(513);
+    assert.equal((await req('/admin/session','POST',{key:process.env.PLUGIN_ADMIN_KEY},'none')).status, 200);
+  } finally { process.env.PLUGIN_ADMIN_KEY = previous; }
+});
 test('admin sessions work with only an administrator key configured', async () => {
   const previous = process.env.PLUGIN_SESSION_SECRET;
   delete process.env.PLUGIN_SESSION_SECRET;

@@ -23,7 +23,7 @@ export async function handlePluginApi(request: Request): Promise<Response> {
     if (area === 'admin') {
       if (name === 'session') {
         if (request.method === 'GET') return json({ authenticated: isAdmin(request) });
-        if (request.method === 'POST') { const input = await body(request); const key = z.string().max(512).parse(input.key); return json({ authenticated: true }, 200, { 'Set-Cookie': await login(request, key) }); }
+        if (request.method === 'POST') { const input = await body(request); const key = z.string().min(1).parse(input.key); return json({ authenticated: true }, 200, { 'Set-Cookie': await login(request, key) }); }
         if (request.method === 'DELETE') { requireAdmin(request); return json({ authenticated: false }, 200, { 'Set-Cookie': cookie(request, '', 0) }); }
       }
       requireAdmin(request);

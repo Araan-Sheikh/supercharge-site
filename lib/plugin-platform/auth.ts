@@ -3,7 +3,7 @@ import { database } from './database';
 import { PlatformError } from './store';
 const COOKIE = 'supercharge_plugin_admin';
 function equal(a: string, b: string) { return timingSafeEqual(createHash('sha256').update(a).digest(), createHash('sha256').update(b).digest()); }
-function configured() { const key = process.env.PLUGIN_ADMIN_KEY, supplied = process.env.PLUGIN_SESSION_SECRET; if (!key || key.length < 32 || (supplied && supplied.length < 32)) throw new PlatformError(503, 'Set PLUGIN_ADMIN_KEY to a random value of at least 32 characters; an optional PLUGIN_SESSION_SECRET must also be at least 32 characters'); const session = supplied || createHmac('sha256', key).update('supercharge-admin-session-v1').digest('hex'); return { key, session }; }
+function configured() { const key = process.env.PLUGIN_ADMIN_KEY, supplied = process.env.PLUGIN_SESSION_SECRET; if (!key || (supplied && supplied.length < 32)) throw new PlatformError(503, 'Set PLUGIN_ADMIN_KEY; an optional PLUGIN_SESSION_SECRET must be at least 32 characters'); const session = supplied || createHmac('sha256', key).update('supercharge-admin-session-v1').digest('hex'); return { key, session }; }
 export function origin(request: Request) {
   const raw = process.env.PLUGIN_PUBLIC_ORIGIN || new URL(request.url).origin;
   const u = new URL(raw);
