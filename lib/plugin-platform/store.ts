@@ -43,7 +43,7 @@ export async function catalog(privateAccess: boolean) {
 }
 function releaseMetadata(r: Row) {
   const d = JSON.parse(String(r.document)) as PluginDocument;
-  return { name: d.name, displayName: d.displayName, version: d.version, description: d.description, source: `catalog:${d.name}@${d.version}`, sha256: String(r.sha256), endpoint: Object.values(d.mcpServers)[0]?.url ?? 'Plugin tools and skills', authentication: 'configured_by_plugin', skillCount: d.skills.length, serverCount: Object.keys(d.mcpServers).length };
+  return { name: d.name, displayName: d.displayName, version: d.version, description: d.description, source: `catalog:${d.name}@${d.version}`, sha256: String(r.sha256), endpoint: Object.values(d.mcpServers)[0]?.url ?? 'Plugin tools and skills', authentication: d.authentication ?? 'configured_by_plugin', skillCount: d.skills.length, serverCount: Object.keys(d.mcpServers).length };
 }
 export async function release(name: string, version: string, privateAccess: boolean) {
   const rows = await (await database()).query(`SELECT r.* FROM plugin_releases r JOIN plugin_entries p ON p.name=r.name WHERE r.name=? AND r.version=? AND p.archived=0 ${privateAccess ? '' : "AND r.visibility='public'"}`, [name, version]);

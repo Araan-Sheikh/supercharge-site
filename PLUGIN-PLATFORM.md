@@ -102,3 +102,27 @@ SUPERCHARGE_TEST_BINARY=/absolute/path/to/target/debug/supercharge-pager node sc
 ```
 
 This checks private catalog discovery/download, installation, version updates, archive rejection and uninstall with a temporary agent home. It refuses non-loopback test hosts and never uses production credentials.
+
+## Starter catalog provenance
+
+The **Add starter plugins** action creates private drafts without replacing existing plugins or publishing anything. The packages are Supercharge-authored skills and configuration pointing to providers' remotely hosted servers; the skill package version is pinned to `1.0.0`, while remote services are managed and changed by their respective providers. Review the server permissions and requirements before enabling them. Account connections and credentials stay on the agent.
+
+| Plugin | Provider documentation and requirements |
+| --- | --- |
+| Microsoft Learn | [Microsoft Learn MCP](https://learn.microsoft.com/en-us/training/support/mcp); no sign-in needed. |
+| GitHub | [GitHub MCP](https://github.com/github/github-mcp-server); GitHub OAuth app or personal access token. |
+| Cloudflare Docs, Cloudflare Agents SDK | [Cloudflare servers](https://developers.cloudflare.com/agents/model-context-protocol/cloudflare/servers-for-cloudflare/); documentation endpoints are public. |
+| Cloudflare | [Cloudflare API MCP](https://developers.cloudflare.com/agents/model-context-protocol/cloudflare/servers-for-cloudflare/); OAuth, account access, and review of write-capable tools. |
+| Context7 | [Context7 MCP](https://github.com/upstash/context7/blob/master/packages/mcp/README.md); optional API key for higher limits. |
+| GitLab | [GitLab MCP](https://docs.gitlab.com/user/model_context_protocol/mcp_server/); GitLab.com account, MCP access and OAuth or token. Self-managed GitLab requires its own server URL. |
+| Linear Read-only | [Linear MCP](https://linear.app/docs/mcp); OAuth or API key. This package uses Linear's read-only endpoint. |
+| Sentry | [Sentry MCP](https://mcp.sentry.dev/); OAuth and Sentry account. |
+| Atlassian | [Atlassian MCP](https://atlassian.github.io/atlassian-mcp-server/); Atlassian Cloud access and OAuth or token. |
+| Stripe | [Stripe MCP](https://docs.stripe.com/mcp); OAuth or agent API key. Review access to live and test accounts. |
+| Supabase | [Supabase MCP](https://supabase.com/docs/guides/ai-tools/mcp); OAuth and Supabase account; the default endpoint may include write-capable tools. |
+| Slack | [Slack MCP](https://docs.slack.dev/ai/slack-mcp-server/); an approved internal or directory-published Slack app and client ID are required. |
+| Notion | [Notion MCP](https://developers.notion.com/guides/mcp/get-started-with-mcp); Notion OAuth and workspace access. |
+| HubSpot | [HubSpot MCP](https://developers.hubspot.com/docs/apps/developer-platform/build-apps/integrate-with-the-remote-hubspot-mcp-server); user-created MCP auth app and OAuth credentials. |
+| Intercom | [Intercom MCP](https://developers.intercom.com/docs/guides/mcp); OAuth or a scoped bearer token. |
+
+Figma and Vercel are not included as ready-to-connect starters because their official servers currently restrict clients to an approved list. Account-specific login and tool availability depend on provider policies and are not guaranteed by importing a draft.

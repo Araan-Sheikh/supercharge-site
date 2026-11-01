@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { handlePluginApi } from '../../lib/plugin-platform/api';
 import { pluginDocument, packageText, type PluginDocument, type PluginRecord } from '../../lib/plugin-platform/schema';
+import { starters } from '../../lib/plugin-platform/starters';
 const dir = mkdtempSync(join(tmpdir(), 'supercharge-platform-test-'));
 process.env.PLUGIN_DATABASE_PATH = join(dir, 'catalog.sqlite');
 process.env.PLUGIN_ADMIN_KEY = 'test-only-admin-key-with-at-least-thirty-two-characters';
@@ -22,7 +23,7 @@ async function req(path: string, method = 'GET', data?: unknown, auth: 'admin'|'
   if (data !== undefined) headers['Content-Type'] = 'application/json';
   return handlePluginApi(new Request(`http://localhost:3000/api/plugins/v1${path}`, { method, headers, body: data === undefined ? undefined : JSON.stringify(data) }));
 }
-type TestResponse = PluginRecord & { plugins: (PluginRecord & { sha256: string })[]; events: { action: string }[] };
+type TestResponse = PluginRecord & { plugins: (PluginRecord & { sha256: string; authentication: string })[]; events: { action: string }[] };
 async function json(response: Response): Promise<TestResponse> { return await response.json(); }
 test('admin authentication, same-origin sessions and secret-free responses', async () => {
   assert.equal((await req('/admin/plugins','GET',undefined,'none')).status,401);
@@ -94,11 +95,34 @@ test('draft CRUD, optimistic revisions, immutable publication, private access, r
   const events=(await json(await req('/admin/audit'))).events;
   assert.ok(events.some((e)=>e.action==='revoke'));assert.ok(events.some((e)=>e.action==='publish'));assert.ok(events.some((e)=>e.action==='archive'));
 });
+test('starter packages have unique valid identities, server URLs and skills', () => {
+  assert.ok(starters.length >= 16);
+  assert.equal(new Set(starters.map(p => p.name)).size, starters.length);
+  for (const starter of starters) {
+    const validated = pluginDocument.parse(starter);
+    assert.equal(validated.visibility, 'private');
+    assert.equal(validated.version, '1.0.0');
+    assert.ok(validated.authentication);
+    assert.ok(validated.skills.length > 0);
+    for (const server of Object.values(validated.mcpServers)) assert.equal(new URL(server.url!).protocol, 'https:');
+    const generated = JSON.parse(packageText(validated));
+    assert.equal(JSON.parse(generated.files['plugin.json']).name, starter.name);
+    for (const skill of starter.skills) assert.ok(generated.files[`skills/${skill.name}/SKILL.md`]);
+  }
+});
 test('starter import is idempotent and produces only private drafts', async () => {
   await req('/admin/seed','POST',{});const first=await json(await req('/admin/plugins'));
+  const github = first.plugins.find(p => p.name === 'github')!;
+  assert.equal((await req('/admin/plugins/github','PUT',{revision:github.revision,document:{...github.draft,description:'Owner custom description'}})).status,200);
   await req('/admin/seed','POST',{});const second=await json(await req('/admin/plugins'));
   assert.equal(first.plugins.length,second.plugins.length);
+  assert.equal(second.plugins.find(p => p.name === 'github')?.draft.description,'Owner custom description');
+  for (const starter of starters) assert.ok(second.plugins.some(p => p.name === starter.name));
   for (const p of second.plugins.filter((p)=>p.name!=='test-plugin')) {assert.equal(p.draft.visibility,'private');assert.equal(p.publishedVersion,null);}
+  const docs=second.plugins.find(p=>p.name==='cloudflare-docs')!;
+  assert.equal((await req('/admin/plugins/cloudflare-docs/publish','POST',{revision:docs.revision})).status,200);
+  const catalog=await json(await req('/plugins','GET',undefined,'catalog'));
+  assert.equal(catalog.plugins.find(p=>p.name==='cloudflare-docs')?.authentication,'none');
   const exported=await (await req('/admin/export')).text();
   assert.ok(!exported.includes(process.env.PLUGIN_ADMIN_KEY!));assert.ok(!exported.includes(process.env.PLUGIN_SESSION_SECRET!));
 });

@@ -24,6 +24,7 @@ export const pluginDocument = z.object({
   description: z.string().trim().min(1).max(1000),
   author: z.string().trim().min(1).max(100).default('Supercharge'),
   visibility: z.enum(['private', 'public']).default('private'),
+  authentication: z.enum(['none', 'oauth', 'oauth_or_bearer', 'configured_by_plugin']).optional(),
   homepage: z.string().url().optional().or(z.literal('')),
   mcpServers: z.record(slug, server).refine((v) => Object.keys(v).length <= 30, 'Maximum 30 MCP servers'),
   skills: z.array(z.object({ name: slug, description: z.string().min(1).max(1000), instructions: z.string().min(1).max(100000) }).strict()).max(30),

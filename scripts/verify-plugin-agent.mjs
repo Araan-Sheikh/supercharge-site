@@ -27,5 +27,10 @@ try{
  await api(`/admin/plugins/${name}`,'DELETE',{revision:p.revision});
  cli(['update',name],false);
  cli(['uninstall',name,'--confirm']);
- console.log(JSON.stringify({catalog:'passed',privatePackageDownload:'passed',nativeInstall:'passed',nativeUpdate:'passed',archivedUpdate:'rejected',uninstall:'passed'}));
+ const seeded=await api('/admin/seed','POST',{});const docs=seeded.plugins.find(p=>p.name==='cloudflare-docs');assert.ok(docs);
+ await api('/admin/plugins/cloudflare-docs/publish','POST',{revision:docs.revision});
+ cli(['install','catalog:cloudflare-docs@1.0.0','--trust']);
+ listed=JSON.parse(cli(['list','--json']).stdout);assert.ok(listed.some(p=>p.name==='cloudflare-docs'));
+ cli(['uninstall','cloudflare-docs','--confirm']);
+ console.log(JSON.stringify({starterInstall:'passed',catalog:'passed',privatePackageDownload:'passed',nativeInstall:'passed',nativeUpdate:'passed',archivedUpdate:'rejected',uninstall:'passed'}));
 }finally{rmSync(home,{recursive:true,force:true});}
