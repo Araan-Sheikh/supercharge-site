@@ -88,7 +88,7 @@ npm run test:plugins:e2e
 
 The Playwright setup uses temporary test data and fixture keys, never the live database. Close other Next dev instances in this checkout first. The test exercises sign-in, create/edit, private publication, exact digest verification, immutable old releases, archive/restore, revocation, mobile layout and sign-out. Live GitHub OAuth and production D1 are separate checks requiring configured accounts.
 
-To verify the website against the actual rebuilt Rust CLI, start the isolated fixture server in one terminal, then run:
+Build the actual CLI executable from the main workspace with `cargo build -p supercharge-pager-bin`. To verify it against the website, start the isolated fixture server in one terminal, then run:
 
 ```sh
 node scripts/plugin-test-server.mjs
