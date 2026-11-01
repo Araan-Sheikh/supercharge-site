@@ -6,6 +6,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
   return (
     <HomeLayout
       {...baseOptions()}
+      links={[{ text: "Documentation", url: "/docs" }, { text: "Plugins", url: "/plugins" }, { text: "Download", url: "/download" }]}
       searchToggle={{ enabled: false }}
       themeSwitch={{ enabled: false }}
       className="[--fd-layout-width:100%]"

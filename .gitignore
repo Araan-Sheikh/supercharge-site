@@ -28,3 +28,11 @@ yarn-error.log*
 .env*.local
 .vercel
 next-env.d.ts
+# plugin platform secrets and durable state
+.data/
+.env
+.env.*
+!.env.example
+.dev.vars*
+/playwright-report/
+/test-results/

@@ -10,7 +10,10 @@
     "start": "NODE_ENV=production node server.mjs",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
     "postinstall": "fumadocs-mdx",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:plugins": "tsx --test tests/plugins/*.test.ts",
+    "test:plugins:e2e": "playwright test",
+    "plugins:setup": "node scripts/setup-plugin-admin.mjs"
   },
   "dependencies": {
     "@langchain/core": "^1.1.5",
@@ -33,10 +36,12 @@
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.4.0",
-    "ws": "^8.22.0"
+    "ws": "^8.22.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/mdx": "^2.0.13",
     "@types/node": "^24.10.2",
@@ -46,6 +51,7 @@
     "eslint-config-next": "^16.0.10",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.17",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.3",
     "vite": "^7.2.7"
   }
