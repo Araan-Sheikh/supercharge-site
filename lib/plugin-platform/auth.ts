@@ -3,7 +3,7 @@ import { database } from './database';
 import { PlatformError } from './store';
 const COOKIE = 'supercharge_plugin_admin';
 function equal(a: string, b: string) { return timingSafeEqual(createHash('sha256').update(a).digest(), createHash('sha256').update(b).digest()); }
-function configured() { const key = process.env.PLUGIN_ADMIN_KEY, session = process.env.PLUGIN_SESSION_SECRET; if (!key || key.length < 32 || !session || session.length < 32) throw new PlatformError(503, 'Set PLUGIN_ADMIN_KEY and PLUGIN_SESSION_SECRET to separate random values of at least 32 characters on the site server'); return { key, session }; }
+function configured() { const key = process.env.PLUGIN_ADMIN_KEY, supplied = process.env.PLUGIN_SESSION_SECRET; if (!key || key.length < 32 || (supplied && supplied.length < 32)) throw new PlatformError(503, 'Set PLUGIN_ADMIN_KEY to a random value of at least 32 characters; an optional PLUGIN_SESSION_SECRET must also be at least 32 characters'); const session = supplied || createHmac('sha256', key).update('supercharge-admin-session-v1').digest('hex'); return { key, session }; }
 export function origin(request: Request) {
   const raw = process.env.PLUGIN_PUBLIC_ORIGIN || new URL(request.url).origin;
   const u = new URL(raw);
@@ -36,7 +36,6 @@ export async function login(request: Request, key: string) {
   sameOrigin(request);
   const config = configured();
   const db = await database();
-  await db.query('CREATE TABLE IF NOT EXISTS plugin_login_attempts (bucket TEXT PRIMARY KEY, count INTEGER NOT NULL, expires INTEGER NOT NULL)');
   const now = Date.now(), expires = Math.floor(now / 600000) * 600000 + 600000;
   const ip = request.headers.get('cf-connecting-ip') || request.headers.get('x-real-ip') || 'site';
   const bucket = createHmac('sha256', config.session).update(`${ip}:${expires}`).digest('hex');

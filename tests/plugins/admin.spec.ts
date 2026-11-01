@@ -59,3 +59,24 @@ test('owner can create, edit, publish, revoke, archive and restore a real plugin
   await page.getByRole('button',{name:'Sign out',exact:true}).click();
   await expect(page.getByLabel('Administrator access key')).toBeVisible();
 });
+
+
+test('admin dashboard shares its password session with plugin management', async ({ page }) => {
+  await page.goto('/admin');
+  await page.getByLabel('Administrator password').fill('incorrect-password');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await expect(page.getByText('Invalid administrator access key', { exact: true })).toBeVisible();
+  await page.getByLabel('Administrator password').fill('local-e2e-admin-key-12345678901234567890123456789');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await expect(page.getByRole('heading', { name: 'Welcome to your control center.' })).toBeVisible();
+  await page.getByRole('link', { name: /Plugins/ }).click();
+  await expect(page).toHaveURL(/\/admin\/plugins$/);
+  await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('link', { name: 'Admin', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Welcome to your control center.' })).toBeVisible();
+  await page.getByRole('button', { name: 'Sign out' }).click();
+  await expect(page.getByLabel('Administrator password')).toBeVisible();
+  await page.goto('/admin/plugins');
+  await expect(page.getByLabel('Administrator access key')).toBeVisible();
+});

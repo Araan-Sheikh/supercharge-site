@@ -37,6 +37,16 @@ test('admin authentication, same-origin sessions and secret-free responses', asy
   assert.equal(blocked.status,403);
   assert.equal((await req('/admin/plugins','GET',undefined,'none',{Cookie:cookie})).status,200);
 });
+test('admin sessions work with only an administrator key configured', async () => {
+  const previous = process.env.PLUGIN_SESSION_SECRET;
+  delete process.env.PLUGIN_SESSION_SECRET;
+  try {
+    const response = await req('/admin/session','POST',{key:process.env.PLUGIN_ADMIN_KEY},'none');
+    assert.equal(response.status, 200);
+    const cookie = response.headers.get('set-cookie')!;
+    assert.equal((await req('/admin/plugins','GET',undefined,'none',{Cookie:cookie})).status, 200);
+  } finally { process.env.PLUGIN_SESSION_SECRET = previous; }
+});
 test('schema refuses traversal, executable URL schemes and pasted common secrets', () => {
   assert.equal(pluginDocument.safeParse({...sample,name:'../escape'}).success,false);
   assert.equal(pluginDocument.safeParse({...sample,mcpServers:{x:{url:'http://example.com/mcp'}}}).success,false);

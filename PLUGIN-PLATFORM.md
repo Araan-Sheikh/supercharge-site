@@ -2,7 +2,8 @@
 
 The existing Supercharge Next.js site now also owns the plugin catalog. The marketing site, documentation, donations and terminal routes remain in the same application.
 
-- `/admin/plugins`: owner sign-in, drafts, MCP JSON and skills, publication, release history/revocation, archive/restore and activity.
+- `/admin`: administrator sign-in and dashboard for site management.
+- `/admin/plugins`: drafts, MCP JSON and skills, publication, release history/revocation, archive/restore and activity.
 - `/plugins`: public published plugins only.
 - `/api/plugins/v1`: catalog and management API.
 - `/api/plugins/v1/openapi.json`: machine-readable endpoint reference.
@@ -15,25 +16,29 @@ Use Node 22.13+ (Node 24 LTS recommended for deployment). Install with `npm ci`.
 npm run plugins:setup -- --origin https://superchargeai.in
 ```
 
-This appends plugin settings to `.env.local` atomically, preserves unrelated settings, makes the file owner-only, and refuses to replace an existing administrator key. It does not deploy anything. Read the administrator key locally from that file, restart the site, and sign in at `/admin/plugins`. Never commit or distribute this file.
+This appends plugin settings to `.env.local` atomically, preserves unrelated settings, makes the file owner-only, and refuses to replace an existing administrator key. It does not deploy anything. Read the administrator key locally from that file, restart the site, and sign in at `/admin`, then open Plugins. Never commit or distribute this file.
 
-The three keys have different purposes:
+The keys have different purposes:
 
 - `PLUGIN_ADMIN_KEY`: owner access, including all management API operations.
-- `PLUGIN_SESSION_SECRET`: signs eight-hour HttpOnly, SameSite=Strict sessions. Rotating it invalidates sessions.
-- `PLUGIN_CATALOG_READ_TOKEN`: read-only access to private published packages. Distribute this token to your own agents, not the administrator key.
+- `PLUGIN_SESSION_SECRET` (optional): independently signs eight-hour HttpOnly, SameSite=Strict sessions. If omitted, a separate signing key is derived from the administrator key; rotating the administrator key invalidates sessions.
+- `PLUGIN_CATALOG_READ_TOKEN` (optional unless using private releases): read-only access to private published packages. Distribute this token to your own agents, not the administrator key.
 
 `PLUGIN_PUBLIC_ORIGIN` must match the actual HTTPS origin behind your proxy; it is used for same-origin checks. Loopback HTTP works for development. Admin bearer requests support automation; browser mutations require the matching Origin. There is no public first-admin signup endpoint. Sign-in attempts are rate limited. Protect the owner key as a high-entropy secret rather than a memorable password.
 
 ## Storage and hosting
 
+**Vercel / Postgres:** connect a Postgres integration (for example Neon) to the project in the Vercel Marketplace. The integration supplies `POSTGRES_URL` or `DATABASE_URL`; use its pooled connection URL. Set `PLUGIN_ADMIN_KEY` to a random value of at least 32 characters. Set `PLUGIN_PUBLIC_ORIGIN` to the production HTTPS origin for a fixed origin check; it falls back to the request origin if omitted. `PLUGIN_CATALOG_READ_TOKEN` is needed when agents install private releases. `PLUGIN_SESSION_SECRET` is optional. Redeploy after configuring environment variables. The first request initializes the Postgres tables and triggers; the database account requires permission to create them. Postgres 14 or later is required.
+
+Postgres takes precedence if a Postgres URL and Cloudflare D1 are both configured. Moving from SQLite or D1 to Postgres starts with an empty catalog: copy data explicitly before switching if you have existing releases. Do not point production to a temporary local database.
+
 **Existing VPS / Node server:** set `PLUGIN_DATABASE_PATH` to an absolute path on persistent storage, for example `/var/lib/supercharge-site/plugins.sqlite`. The default is `.data/plugins.sqlite` for local development. SQLite uses WAL and atomic SQL updates. Include the database and WAL in consistent backups using SQLite backup tooling.
 
 **Cloudflare data:** set all of `CLOUDFLARE_ACCOUNT_ID`, `PLUGIN_D1_DATABASE_ID`, and `CLOUDFLARE_D1_API_TOKEN` to use D1 instead. The API token needs access to the selected D1 database. Calls use [Cloudflare's HTTPS query API](https://developers.cloudflare.com/d1/) on the server; credentials never reach the browser. The plugin tables/triggers are initialized idempotently on first use. Do not configure only part of this group; partial configuration fails closed.
 
-The current site uses a custom Node server and `node-pty` for `/terminal`. This change does not port that runtime to Workers. You can run it on your existing VPS behind Cloudflare, with plugin data in D1. Vercel can host the Next.js plugin pages/API with D1, but the native terminal still requires its separate Node host. A Vercel deployment without D1 is refused for the plugin database because local function storage is ephemeral. Cloudflare-native hosting of the entire existing site would require a separate runtime migration.
+The current site uses a custom Node server and `node-pty` for `/terminal`. This change does not port that runtime to Workers. You can run it on your existing VPS behind Cloudflare, with plugin data in D1. Vercel can host the Next.js plugin pages/API with D1, but the native terminal still requires its separate Node host. A Vercel deployment without Postgres or D1 is refused for the plugin database because local function storage is ephemeral. Cloudflare-native hosting of the entire existing site would require a separate runtime migration.
 
-No D1 database, domain, production secret or deployment is created by this implementation. SQLite and D1 use the same parameterized statements. Live D1 requires your account configuration. Automated tests exercise SQLite and a mocked D1 HTTPS adapter using the actual parameterized SQL, not a live Cloudflare database.
+No D1 database, domain, production secret or deployment is created by this implementation. SQLite and D1 use the same parameterized statements. Live Postgres and D1 require your account configuration. Automated tests exercise SQLite and a mocked D1 HTTPS adapter using the actual parameterized SQL, not a live Cloudflare database.
 
 ## Plugin lifecycle
 
