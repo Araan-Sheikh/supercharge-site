@@ -13,7 +13,7 @@ The existing Supercharge Next.js site now also owns the plugin catalog. The mark
 Use Node 22.13+ (Node 24 LTS recommended for deployment). Install with `npm ci`. Generate independent keys without printing them into command output:
 
 ```sh
-npm run plugins:setup -- --origin https://superchargeai.in
+npm run plugins:setup -- --origin https://www.superchargeai.in
 ```
 
 This appends plugin settings to `.env.local` atomically, preserves unrelated settings, makes the file owner-only, and refuses to replace an existing administrator key. It does not deploy anything. Read the administrator key locally from that file, restart the site, and sign in at `/admin`, then open Plugins. Never commit or distribute this file.
@@ -55,7 +55,7 @@ Export downloads drafts and release metadata, not every historical package. Back
 Use a CLI built with central-catalog support:
 
 ```sh
-supercharge plugin catalog configure --url https://superchargeai.in/api/plugins/v1
+supercharge plugin catalog configure --url https://www.superchargeai.in/api/plugins/v1
 supercharge plugin catalog
 supercharge plugin install catalog:github@1.0.0 --trust
 ```
