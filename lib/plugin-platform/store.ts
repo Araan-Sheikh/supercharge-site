@@ -39,7 +39,7 @@ export async function revoke(name: string, version: string) {
   if (!rows.length) throw new PlatformError(409, 'Release not found or already revoked');
 }
 export async function catalog(privateAccess: boolean) {
-  return (await (await database()).query(`SELECT r.* FROM plugin_entries p JOIN plugin_releases r ON r.name=p.name AND r.version=p.published_version WHERE p.archived=0 AND r.revoked=0 ${privateAccess ? '' : "AND r.visibility='public'"} ORDER BY r.name`)).map((r) => releaseMetadata(r));
+  return (await (await database()).query(`SELECT r.document, r.sha256 FROM plugin_entries p JOIN plugin_releases r ON r.name=p.name AND r.version=p.published_version WHERE p.archived=0 AND r.revoked=0 ${privateAccess ? '' : "AND r.visibility='public'"} ORDER BY r.name`)).map((r) => releaseMetadata(r));
 }
 function releaseMetadata(r: Row) {
   const d = JSON.parse(String(r.document)) as PluginDocument;

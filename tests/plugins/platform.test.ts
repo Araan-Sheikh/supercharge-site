@@ -95,7 +95,7 @@ test('draft CRUD, optimistic revisions, immutable publication, private access, r
   const events=(await json(await req('/admin/audit'))).events;
   assert.ok(events.some((e)=>e.action==='revoke'));assert.ok(events.some((e)=>e.action==='publish'));assert.ok(events.some((e)=>e.action==='archive'));
 });
-test('starter packages have unique valid identities, server URLs and skills', () => {
+test('starter packages have unique valid identities, server configuration and skills', () => {
   assert.ok(starters.length >= 16);
   assert.equal(new Set(starters.map(p => p.name)).size, starters.length);
   for (const starter of starters) {
@@ -104,7 +104,13 @@ test('starter packages have unique valid identities, server URLs and skills', ()
     assert.equal(validated.version, '1.0.0');
     assert.ok(validated.authentication);
     assert.ok(validated.skills.length > 0);
-    for (const server of Object.values(validated.mcpServers)) assert.equal(new URL(server.url!).protocol, 'https:');
+    for (const server of Object.values(validated.mcpServers)) {
+      if (server.url) assert.equal(new URL(server.url).protocol, 'https:');
+      else {
+        assert.equal(server.command, 'npx');
+        assert.ok(server.args?.some((arg) => /@\d+\.\d+\.\d+$/.test(arg)), 'local npm packages must pin an exact version');
+      }
+    }
     const generated = JSON.parse(packageText(validated));
     assert.equal(JSON.parse(generated.files['plugin.json']).name, starter.name);
     for (const skill of starter.skills) assert.ok(generated.files[`skills/${skill.name}/SKILL.md`]);

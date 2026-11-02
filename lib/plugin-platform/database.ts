@@ -48,10 +48,9 @@ export async function database(): Promise<Database> {
       try {
         const client = await pool.connect();
         try {
-          await client.query('BEGIN');
-          await client.query('SELECT pg_advisory_xact_lock(721438964216)');
-          for (const sql of postgresSchema) await client.query(sql);
-          await client.query('COMMIT');
+          // Send initialization as one batch: on serverless cold starts the
+          // database can be far from the function, making each round trip costly.
+          await client.query(`BEGIN; SELECT pg_advisory_xact_lock(721438964216); ${postgresSchema.join(';\n')}; COMMIT;`);
         } catch (error) {
           await client.query('ROLLBACK');
           throw error;
