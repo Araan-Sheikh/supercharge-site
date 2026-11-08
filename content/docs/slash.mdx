@@ -37,8 +37,9 @@ Type `/` in the prompt. The menu fuzzy-matches. A skill with `user-invocable: tr
 | `/format` | Switch Chat Completions, Messages, or Responses. |
 | `/logout` | Clear session auth. Does not wipe `/setup`. |
 | `/always-approve` | Toggle skip-all permission prompts. |
-| `/auto` | Toggle the classifier that approves safe tools. Shown when that mode is enabled. |
+| `/auto` | Toggle Auto-Review. A classifier approves tools it treats as safe. |
 | `/plan [text]` | Plan mode. |
+| `/new_agent`, `/new-agent` | Create a custom agent in this chat. Paste a full prompt, or let the chat draft it. See [Custom agents](/docs/agents). |
 | `/view-plan`, `/show-plan`, `/plan-view` | Preview the saved plan. |
 | `/multiline`, `/ml` | Enter inserts a newline. Shift+Enter or Alt+Enter sends. |
 | `/compact-mode` | Tighter layout. |
@@ -63,7 +64,7 @@ Project workflows: `.supercharge/workflows/*.rhai`. User workflows: `~/.supercha
 | `/marketplace` | Marketplace tab. |
 | `/hooks` | Hooks tab. |
 | `/mcps` | MCP server modal. |
-| `/config-agents`, `/agents` | Agent definitions and personas. Not the live dashboard. |
+| `/config-agents`, `/agents` | Your custom agents. Press `n` to create one. Skills and plugin agents are not listed. Not the live dashboard. |
 | `/personas` | Create and edit personas. |
 | `/theme`, `/t` | Color theme. Fullscreen only. |
 | `/settings` | Settings modal, including default screen mode. |
@@ -80,7 +81,68 @@ Project workflows: `.supercharge/workflows/*.rhai`. User workflows: `~/.supercha
 | `/feedback [message]` | Feedback form, or send immediately when you pass text. |
 | `/import-claude` | Import permissions, env, MCP, hooks, and paths from `~/.claude`. |
 | `/usage`, `/cost` | This session's token totals. Supercharge does not sell credits. |
+| `/credits` | Mistral balance popup after Mistral Auth. Other providers do not fill this popup. |
 | `/find`, `/jump`, `/timeline` | Fullscreen-only navigation. |
 | `/expand` | Minimal mode only. |
 
 `/memory`, `/flush`, and `/dream` are on [Memory](/docs/memory). `/remember` works even when the experimental memory switch is off.
+
+## While a turn is running
+
+| Command | What it does |
+| --- | --- |
+| `/queue` | List prompts waiting behind the current turn. In the full screen you can also use the queue pane. |
+| `/tasks` | List background tasks, subagents, and scheduled jobs. |
+| `/recap`, `/summarize` | Summarize where the session is. The summary is a scrollback note. It is not sent back to the model as your next prompt. |
+| `/voice` | Dictation into the prompt. Ctrl+Space or F8 starts it. Esc stops. Enter stops and sends. Hold-to-talk needs a terminal that reports key releases. |
+
+## Reading the session
+
+| Command | What it does |
+| --- | --- |
+| `/transcript`, `/log` | Open the conversation in `$PAGER` (default `less`). The TUI waits until you quit the pager. |
+| `/cd [path]` | Dashboard only. Sets the directory new sessions start in. Elsewhere it tells you to open `/dashboard`. |
+| `/timestamps` | Show or hide timestamps in the transcript. |
+| `/announcements` | Product notices. |
+| `/privacy` | What stays on this machine. |
+| `/donate` | Open the donate page. |
+
+`/share` is on the menu and currently answers that session sharing is turned off.
+
+## Lookup and toggles
+
+| Command | What it does |
+| --- | --- |
+| `/help`, `/commands`, `/h` | Open the command palette. Same as Ctrl+P. In minimal mode this is how you browse commands and shortcuts. |
+| `/context-window <size>` | Pick a context-window size when the current model advertises more than one. Hidden when there is only one. |
+| `/save-tokens [on\|off]` | Shorter replies. Aliases `/pony` and `/ponytail`. |
+| `/REA-mode [on\|off]` | Add the reverse-engineering guide to every turn. Aliases `/rea-mode` and `/rea`. |
+| `/import-settings` | Open the Claude settings import modal. Alias `/import-claude`. Scans `.claude/settings*.json`, `~/.claude.json`, and `.mcp.json`. Same as Ctrl+I on the welcome screen. Arguments are ignored. |
+| `/settings` | Settings modal. Aliases `/config`, `/preferences`, `/prefs`. Type `/` inside the modal to filter. Arguments are ignored. |
+| `/toggle-mouse-reporting` | Hand mouse selection back to the terminal, or take it back. Shown only when `[ui] mouse_reporting_toggle = true`. Ctrl+R does the same from the scrollback. |
+
+## Shell session commands
+
+These run in the agent session, including ACP. The pager menu folds hooks and plugins into modals, and these names still work when you type them.
+
+| Command | What it does |
+| --- | --- |
+| `/hooks-list` | Hooks loaded in this session. |
+| `/hooks-trust` | Trust this project so hooks may run. |
+| `/hooks-untrust` | Remove that trust. |
+| `/hooks-add <path>` | Add a hook file or directory. |
+| `/hooks-remove <path>` | Remove that path. |
+| `/plugins list` | Installed plugins. |
+| `/plugins install <source> [--trust]` | Install. `--trust` trusts it in the same step. |
+| `/plugins uninstall <name> [--confirm]` | Remove. `--confirm` skips the extra prompt. |
+| `/plugins update [name]` | Update one plugin, or all when the name is omitted. |
+| `/plugins reload`, `/reload-plugins` | Read plugins from disk again. |
+| `/plugins trust <path>`, `/plugins add <path>`, `/plugins remove <path>` | Trust or attach a local plugin path. |
+
+## Hidden commands
+
+| Command | What it does |
+| --- | --- |
+| `/debug [scroll\|fps\|log]` | Debug overlays. Listed only on debug builds. A release binary still runs it if you type the name. |
+| `/scroll-debug` | Same as `/debug scroll`. Not listed. |
+| `/gboom` | Not listed. |

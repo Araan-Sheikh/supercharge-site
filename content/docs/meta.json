@@ -13,6 +13,7 @@
     "config",
     "memory",
     "extensions",
-    "modes"
+    "modes",
+    "agents"
   ]
 }

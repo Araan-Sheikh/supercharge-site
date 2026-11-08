@@ -20,6 +20,8 @@ Inside the UI: `/new`, `/resume`, Ctrl+N, or `/home` to return to the welcome li
 
 `-s` / `--session-id` creates a new session with a UUID you choose. It does not open an old one.
 
+A resumed session comes back as Agent, Plan, or Ask. A custom agent you had selected is not the current mode after a restart. The markdown file is still on disk. Shift+Tab selects it again. See [Custom agents](/docs/agents).
+
 `--fork-session` with `-c` or `-r` copies history into a new id instead of appending.
 
 ## Names
@@ -60,7 +62,7 @@ supercharge usage <session-id> [turn]
 
 ## Dashboard
 
-`/dashboard` (also `/sessions`) lists top-level sessions in this pager so you can peek, reply, pin, rename, stop, or attach. `Ctrl+\` opens it from the keys that the guide binds to the dashboard. It is not `/agents`, which edits agent definitions.
+`/dashboard` (also `/sessions`) lists top-level sessions in this pager so you can peek, reply, pin, rename, stop, or attach. `Ctrl+\` opens it from the keys that the guide binds to the dashboard. It is not `/agents`, which lists custom agents you created. See [Custom agents](/docs/agents).
 
 Disable it with `SUPERCHARGE_AGENT_DASHBOARD=0` or:
 

@@ -22,9 +22,44 @@ Then type:
 ## What you enter
 
 1. Pick a listed provider, or choose Custom and type a base URL.
-2. Choose the API format: **Chat Completions**, **Messages**, or **Responses**.
-3. Enter the API key when the provider requires one. A local server can run without a key.
+2. Choose the API format: **Chat Completions**, **Messages**, or **Responses**. A listed provider already picks the format that matches its API.
+3. Enter the API key when the provider requires one. A local server can run without a key. Mistral Auth and Nous open a browser instead of asking you to paste a key.
 4. Pick a model from the list the provider returns, or type an id that endpoint accepts.
+
+## Listed providers
+
+`/setup` shows these rows, plus Custom. Each row stores its own base URL and key, so OpenCode Go and OpenCode Zen stay separate from ZenLLM, and Mistral Auth stays separate from a pasted Mistral key.
+
+| Row | How you sign in | Format |
+| --- | --- | --- |
+| Pollinations | Key optional on the free route | Chat Completions |
+| OpenAI | API key | Chat Completions |
+| Anthropic | API key | Messages |
+| OpenRouter | API key | Chat Completions |
+| DeepSeek | API key | Chat Completions |
+| Google AI Studio | API key | Chat Completions |
+| Groq | API key | Chat Completions |
+| Z.AI / GLM | API key | Chat Completions |
+| Kimi Coding | API key | Chat Completions |
+| Moonshot (Kimi Anthropic) | API key | Messages |
+| Qwen Cloud | API key | Chat Completions |
+| Mistral Auth | Browser sign-in | Chat Completions |
+| Mistral API Key | Pasted key | Chat Completions |
+| Together AI | API key | Chat Completions |
+| Fireworks AI | API key | Chat Completions |
+| xAI (Grok) | API key | Chat Completions |
+| Routing.run | API key | Chat Completions |
+| ZenLLM | API key | Chat Completions |
+| OpenCode Go | OpenCode subscription | Chat Completions |
+| OpenCode Zen | OpenCode pay-as-you-go | Chat Completions |
+| AgentRouter | API key | Responses |
+| Nous Research | Browser sign-in | Chat Completions |
+| Ollama (local) | Key optional. Default `http://127.0.0.1:11434/v1` | Chat Completions |
+| LM Studio | Key optional. Default `http://127.0.0.1:1234/v1` | Chat Completions |
+
+After Mistral Auth, `/credits` opens a balance popup for that account. It shows percent used and dollars spent while it loads.
+
+ChatGPT (Codex) browser sign-in exists in the source and can still load a config that was saved earlier. It is hidden from the `/setup` picker while that Responses stream is unfinished. Use OpenAI with an API key for Chat Completions.
 
 The base URL should look like `https://api.example.com/v1`. Do not append `/chat/completions`, `/messages`, or `/responses`. The CLI adds that path from the format you chose.
 

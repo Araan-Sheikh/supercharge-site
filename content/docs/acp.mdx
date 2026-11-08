@@ -121,6 +121,8 @@ Clients may pass `mcpServers` during session creation or load. They can also use
 
 Supercharge also advertises optional extension methods in `initialize`. Existing wire names use the `x.ai/` prefix for compatibility; changing that prefix would break clients. Categories include `x.ai/fs/*` (files), `x.ai/git/*` and `x.ai/git/worktree/*` (version control), `x.ai/search/*`, `x.ai/terminal/*`, `x.ai/auth/*`, and session-related methods. Notifications may include file-index changes or session-specific updates. These are **not** required for a basic ACP prompt. Discover methods and capabilities at runtime rather than treating examples as a fixed complete list.
 
+Custom agents use two more methods, advertised as `_supercharge/agents/list` and `_supercharge/agents/create`. The shell accepts the same names without the leading underscore. Both take `sessionId`. Create also takes `name`, `instructions`, optional `description`, and optional `scope` (`project` or `user`). The CLI writes `~/.supercharge/agents/<name>.md` or `.supercharge/agents/<name>.md`, then `session/set_mode` selects that id. See [Custom agents](/docs/agents).
+
 ## Troubleshooting
 
 | Symptom | Check |

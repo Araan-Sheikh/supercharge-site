@@ -18,16 +18,16 @@ curl -fsSL https://www.superchargeai.in/install.sh | bash
 Pin a version (the number is the release tag without `v`):
 
 ```bash
-curl -fsSL https://www.superchargeai.in/install.sh | bash -s 1.3.20
+curl -fsSL https://www.superchargeai.in/install.sh | bash -s 1.4.5
 ```
 
 Or:
 
 ```bash
-SUPERCHARGE_VERSION=1.3.20 bash -c "$(curl -fsSL https://www.superchargeai.in/install.sh)"
+SUPERCHARGE_VERSION=1.4.5 bash -c "$(curl -fsSL https://www.superchargeai.in/install.sh)"
 ```
 
-`1.3.20` is only an example of a published tag. Use the tag you want from the releases page. This docs set describes source **1.3.33**.
+`1.4.5` is the release these pages describe. Use another tag from the releases page when you want an older build.
 
 Git Bash and MSYS2 on Windows can use the same bash script.
 
@@ -40,7 +40,7 @@ irm https://www.superchargeai.in/install.ps1 | iex
 A specific version:
 
 ```powershell
-& ([scriptblock]::Create((irm https://www.superchargeai.in/install.ps1))) -Version 1.3.20
+& ([scriptblock]::Create((irm https://www.superchargeai.in/install.ps1))) -Version 1.4.5
 ```
 
 The `www.superchargeai.in` address serves the installer directly. The bare `superchargeai.in` host redirects to `www` with HTTP 308, which Windows PowerShell 5.1 may reject. Run the command above as your normal Windows user so it installs under that user's profile; administrator privileges are not required for the default location.

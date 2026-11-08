@@ -46,7 +46,33 @@ Hooks are scripts or HTTP callbacks around tool calls (before and after).
 /hooks
 ```
 
-The shell also accepts `/hooks-list`, `/hooks-trust`, `/hooks-add`, `/hooks-remove`, and `/hooks-untrust`. The pager folds those into the modal. Trusting a project is an explicit step. Opening the modal does not trust it.
+Opening the modal does not trust the project. Trust is a separate step.
+
+| Command | What it does |
+| --- | --- |
+| `/hooks-list` | Hooks loaded in this session. |
+| `/hooks-trust` | Allow hooks to run in this project. |
+| `/hooks-untrust` | Remove that trust. |
+| `/hooks-add <path>` | Load a hook file or a directory of hooks. |
+| `/hooks-remove <path>` | Stop loading that path. |
+
+Plugin management from the prompt:
+
+```
+/plugins list
+/plugins install <source>
+/plugins install <source> --trust
+/plugins uninstall <name> --confirm
+/plugins update
+/plugins update <name>
+/plugins reload
+/reload-plugins
+/plugins add <path>
+/plugins remove <path>
+/plugins trust <path>
+```
+
+`/plugin` is the same as `/plugins`. Install without `--trust` leaves the plugin untrusted. Uninstall without `--confirm` asks first.
 
 ## Project rules
 

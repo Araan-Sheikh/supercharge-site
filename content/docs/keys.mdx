@@ -16,8 +16,11 @@ Bindings are built in. They are not remapped from a keymap file.
 | Ctrl+C | With a draft, the first press clears it. With an empty composer, it cancels the running turn. |
 | Esc | Does not cancel a turn. Idle, press Esc twice within 800ms to clear a non-empty prompt, or to open rewind when the prompt is empty and there is history. |
 | Ctrl+N | New session. Same as `/new`. |
+| Ctrl+P | Command palette. Same as `/help`. |
 | Ctrl+O | Toggle always-approve. |
-| Shift+Tab | Cycle permission mode: Normal, Plan, Auto when enabled, Always-approve. |
+| Ctrl+Space, F8 | Start dictation. Esc stops. Enter stops and sends. Same as `/voice`. |
+| Ctrl+I | On the welcome screen, open the Claude settings import. Same as `/import-settings`. |
+| Shift+Tab | Cycle Agent, Plan, Ask, your custom agents, Always-Approve, then Auto-Review. |
 | Ctrl+G | Edit the current draft in `$VISUAL` or `$EDITOR` (minimal mode command palette uses the same action). |
 | Ctrl+M | In the prompt, toggle multiline. In the scrollback, open the model picker. |
 | @ | File picker. `@src/main.rs:10-50` attaches a line range. `@!.env` includes ignored and hidden files. |
@@ -40,6 +43,8 @@ Simple mode is the default. `/vim-mode` or `[ui] vim_mode = true` enables the le
 | Page | PageUp / PageDown, Ctrl+U / Ctrl+D | same |
 
 Arrow keys, Tab, Esc, Space, PageUp, PageDown, and Ctrl+letter shortcuts work in both modes. A bare letter in simple mode jumps back to the prompt and types that letter.
+
+Ctrl+R, with the scrollback focused, toggles mouse capture when `[ui] mouse_reporting_toggle = true`. Off, the terminal does native click-drag copy. `/toggle-mouse-reporting` does the same from the prompt.
 
 ## Paste
 

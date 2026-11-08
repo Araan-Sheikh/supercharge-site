@@ -1,0 +1,101 @@
+---
+title: Custom agents
+description: Write a chat agent, save it as markdown, and switch to it with Shift+Tab
+---
+
+# Custom agents
+
+A custom agent is a work mode you wrote. It sits next to Agent, Plan, and Ask. It is not a permission mode, and it is not a skill.
+
+| Kind | What it changes | How you pick it |
+| --- | --- | --- |
+| Work mode | What the model is allowed to do this turn | Shift+Tab, or `/plan` |
+| Permission mode | Whether tools ask you first | Shift+Tab, `/always-approve`, `/auto`, Ctrl+O |
+| Custom agent | Extra instructions loaded for this chat | Shift+Tab, after you create the file |
+| Skill | A reusable prompt pack the model can load | `/skills`. Never listed as an agent |
+| Persona | A voice you attach in `/personas` | `/personas`, not Shift+Tab |
+
+Agent is the normal coding mode: it can read, edit, and run tools, subject to your permission mode. Plan writes a plan before it edits. Ask is read-only, so it will not save a new agent file. Always-Approve skips tool prompts. Auto-Review lets a classifier approve tools it treats as safe and still asks on the rest.
+
+## Create one from the chat
+
+```
+/new_agent
+```
+
+`/new-agent` is the same command. You can also paste the prompt on the same line:
+
+```
+/new_agent You are a reviewer. First line of every reply is REVIEW. Do not edit files.
+```
+
+The chat asks at most five things, and it skips any you already answered:
+
+1. Use your words as the full prompt, or draft one from a short description.
+2. Name.
+3. One-line description.
+4. Save for every project, or only this project.
+5. What the agent must always do, and what it must not do.
+
+Stay on Agent while it writes. Ask will not create the file. When the file exists, Shift+Tab until the banner says `Switched to mode: <name>`.
+
+## Create one from the form
+
+```
+/agents
+```
+
+Press `n`. The form asks for a name, a description, and the instructions. Space toggles **user** (every project) and **project** (this repo only). Enter saves. Esc cancels.
+
+`/agents` lists only agents you created. Skills, plugin agents, and bundled agents are not in that list and not in the Shift+Tab ring.
+
+## Name rules
+
+- Lowercase letters, numbers, and hyphens.
+- Starts with a letter.
+- At most 64 characters.
+- Rejected: `default`, `plan`, `ask`, `browser_use`, and built-in agent names such as `explore` and `plan`.
+
+Description is optional and capped at 200 characters. Empty becomes `Custom agent`. Instructions are required and capped at 8000 characters. Saving again under the same name in the same folder fails until you remove or rename the file.
+
+## The file
+
+| Scope | Path |
+| --- | --- |
+| Every project | `~/.supercharge/agents/<name>.md` |
+| This project | `.supercharge/agents/<name>.md` in the repo |
+
+`SUPERCHARGE_HOME` moves the user folder. A project file shadows a user file with the same name.
+
+The writer saves this shape. The `custom: true` line is what puts the agent on the menu. A hand-written file without that exact line in the frontmatter stays hidden.
+
+```markdown
+---
+name: reviewer
+description: "Reviews diffs and does not edit"
+custom: true
+---
+
+Comment on the diff. Do not edit files. Start every reply with REVIEW.
+```
+
+## Switch to it
+
+From Agent, Shift+Tab walks:
+
+1. Plan
+2. Ask
+3. Each custom agent, in discovery order
+4. Always-Approve
+5. Auto-Review
+6. Agent again
+
+The banner is `Switched to mode: Plan`, `Switched to mode: reviewer`, `Switched to mode: Always-Approve`, or `Switched to mode: Auto-Review`. A file written during this session shows up on the next Shift+Tab. You do not need a new process.
+
+Selecting a custom agent keeps the coding tool loop (the same prompt mode as Agent) and replaces the agent definition with that markdown. Always-Approve and Auto-Review clear the custom agent and return the work mode to Agent, then change only the permission mode. Ctrl+O still toggles Always-Approve on its own.
+
+The displayed custom name is for this process. After you quit and resume, the session comes back as Agent, Plan, or Ask. Open Shift+Tab again to reselect the custom agent. The markdown file is still on disk.
+
+## Studio
+
+Studio's chat menu sends the same fields to the CLI over ACP (`supercharge/agents/create` and `supercharge/agents/list`). The CLI writes the markdown. The next `session/set_mode` loads that file. Editing the file by hand and editing it in Studio are the same store.

@@ -53,6 +53,7 @@ vim_mode = false
 show_thinking_blocks = true
 remember_tool_approvals = true
 screen_mode = "fullscreen"
+mouse_reporting_toggle = false
 
 [session]
 auto_compact_threshold_percent = 85
@@ -64,7 +65,9 @@ enabled = true
 enabled = false
 ```
 
-`[ui] screen_mode` is the default for a new `supercharge`. `/minimal` and `--minimal` change only the current session. Set the default from `/settings` → Default screen mode.
+`[ui] screen_mode` is the default for a new `supercharge`. `/minimal` and `--minimal` change only the current session. `/settings` (also `/config`, `/preferences`, `/prefs`) opens the modal. `/` inside it filters rows. Arguments after `/settings` are ignored.
+
+`[ui] mouse_reporting_toggle = true` shows `/toggle-mouse-reporting` and lets Ctrl+R give mouse selection back to the terminal.
 
 `[memory] enabled` or `SUPERCHARGE_MEMORY=1` turns on the experimental memory v2 commands (`/memory`, `/flush`, `/dream`). Curated `USER.md` / `MEMORY.md` notes are separate and on by default. See [Memory](/docs/memory).
 

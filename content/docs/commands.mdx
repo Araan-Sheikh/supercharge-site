@@ -67,5 +67,34 @@ supercharge -r 3f2a1c0e-0000-4000-8000-000000000000
 | `supercharge agent serve` | ACP agent over WebSocket. See [Agent Client Protocol (ACP)](/docs/acp). |
 | `supercharge agent daemon` | HTTP inbox when its companion server is present; otherwise ACP WebSocket fallback. See [Run modes](/docs/modes). |
 | `supercharge usage <session-id> [turn]` | Print stored token totals for a local session. |
+| `supercharge browser install` | Download the optional headless browser used by browser tools. |
+| `supercharge browser status` | Show whether that binary is installed. |
+| `supercharge browser uninstall` | Remove the browser binary and its skill copy. |
+| `supercharge eval run --preset smoke` | Grade the agent on a built-in set: `smoke`, `rust`, or `web`. |
+| `supercharge eval run --dataset <path>` | Grade a JSONL dataset, or a directory of `.jsonl` files. |
+| `supercharge eval best-of` | Race several attempts at one task and keep the patch that passes `--test-cmd`. |
 
 `supercharge clone <url> [dir]` is off unless Grove clone is enabled (`SUPERCHARGE_CLONE=1`, `SUPERCHARGE_GROVE=1`, or the matching config). The default checkout is depth 1. `--full-history` clones everything.
+
+## Browser tools
+
+Browser tools need a local browser binary. They are off until you install it:
+
+```bash
+supercharge browser install
+supercharge browser status
+supercharge browser uninstall
+```
+
+`install` downloads the platform binary into the Supercharge home. `status` prints whether it is there. `uninstall` removes the binary and the browser skill copy under `~/.supercharge/skills/browser`.
+
+## Evals
+
+```bash
+supercharge eval run --preset smoke
+supercharge eval run --preset rust --attempts 3 --concurrency 2
+supercharge eval run --dataset tasks.jsonl --out-dir .supercharge-eval/runs
+supercharge eval best-of --instructions "Fix the parser" --repo-path . --test-cmd "cargo test" --n 4
+```
+
+Presets are `smoke`, `rust`, and `web`. `--dataset` is a JSONL file or a directory of them, and it is required when you omit `--preset`. Each run writes `run.json`, `grades.json`, and `report.md`. The default agent invocation is `supercharge --single {prompt}` inside the task worktree. `--attempts` turns on pass@k. `best-of` races `--n` attempts (default 4), each with a 300 second budget, and keeps the attempt whose `--test-cmd` exits 0.

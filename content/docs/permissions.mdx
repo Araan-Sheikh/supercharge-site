@@ -7,17 +7,31 @@ description: Ask, auto, always-approve, and allow or deny rules
 
 By default the agent asks before it runs a shell command or edits a file.
 
+Work mode and permission mode are separate. Shift+Tab changes both, one stop at a time. Details of custom agents are on [Custom agents](/docs/agents).
+
+| Work mode | What the model does |
+| --- | --- |
+| Agent | Reads, edits, and runs tools. This is the normal chat. |
+| Plan | Writes a plan first. `/plan [text]` enters it and can start the turn with that text. `/view-plan` shows the saved plan. |
+| Ask | Read-only. It answers and does not write files, including a new agent file. |
+
+| Permission mode | What happens before a tool runs |
+| --- | --- |
+| Ask | You approve each shell command and edit. |
+| Auto-Review (`/auto`) | A classifier approves tools it treats as safe. Dangerous ones can still ask. |
+| Always-Approve (`/always-approve`, Ctrl+O, `--yolo`) | Tool prompts are skipped. Deny rules and hooks still apply. |
+
+Turning on the permission mode you are already in switches back to ask. Turning one permission mode on while another is active switches to the new one. Always-Approve wins over Auto-Review when both would be set. Always-Approve and Auto-Review also return the work mode to Agent.
+
 ## Modes
 
 | How | Effect |
 | --- | --- |
 | Default | Ask each time. |
 | `/always-approve`, Ctrl+O, `--yolo`, `--permission-mode bypassPermissions` | Skip approval prompts. |
-| `/auto` | A classifier approves tools it treats as safe. Dangerous ones can still ask. The command appears only when that feature is on. |
-| Shift+Tab | Cycle Normal, Plan, Auto (if enabled), Always-approve. |
+| `/auto` | Auto-Review. A classifier approves tools it treats as safe. Dangerous ones can still ask. |
+| Shift+Tab | Cycle Agent, Plan, Ask, your custom agents, Always-Approve, then Auto-Review. |
 | `/plan` | Plan before coding. `/view-plan` shows the saved plan. |
-
-Turning on the mode you are already in switches back to ask. Turning on one mode while another is active switches to the new one.
 
 Always-approve is the mode to use when nobody is at the keyboard (`supercharge agent serve`, a daemon, CI). Deny rules and hooks still apply.
 

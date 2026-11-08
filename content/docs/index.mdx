@@ -13,8 +13,11 @@ The agent calls itself Supercharge AI, built by R3AP3R Editz. It is a terminal U
 
 1. [Install](/docs/install) the binary.
 2. Run `supercharge` in a project.
-3. Run `/setup` and save a provider. Details are on [Provider setup](/docs/setup).
-4. Type a task and press Enter. Approve tools, or turn on always-approve when you mean to.
+3. Run `/setup` and save a provider. The listed providers, key versus browser sign-in, and the three API formats are on [Provider setup](/docs/setup).
+4. Type a task and press Enter. The agent asks before it runs a shell command or edits a file.
+5. Press Shift+Tab to move among Agent, Plan, Ask, any custom agent you created, Always-Approve, and Auto-Review. How those differ is on [Permissions](/docs/permissions) and [Custom agents](/docs/agents).
+
+A normal turn can read the repo, edit files, and run commands. `/plan` makes it write the plan first. Ask only answers. `/queue` shows prompts waiting behind the current turn. `/tasks` shows background work. `/resume` comes back to a saved session. `/model` and `/effort` change the model for later turns. `/compact` shrinks history when the window fills up. The full list is on [Slash commands](/docs/slash).
 
 ## Where everything lives
 
@@ -24,17 +27,19 @@ The agent calls itself Supercharge AI, built by R3AP3R Editz. It is a terminal U
 | `~/.supercharge/config.toml` | Provider, models, UI, and feature settings. |
 | `~/.supercharge/sessions/` | Saved conversations. |
 | `~/.supercharge/memories/` | Curated notes: `USER.md` and `MEMORY.md`. |
+| `~/.supercharge/agents/` | Custom agents you created for every project. See [Custom agents](/docs/agents). |
 | `~/.supercharge/docs/user-guide/` | Built-in guides copied on launch. `/docs` opens them inside the TUI. |
 
 `SUPERCHARGE_HOME` moves that whole directory. `SUPERCHARGE_BIN_DIR` moves only the install location.
 
 ## What to read
 
-- [CLI commands](/docs/commands) for flags such as `-p`, `-c`, `--yolo`, and `supercharge agent`.
+- [CLI commands](/docs/commands) for flags such as `-p`, `-c`, `--yolo`, `supercharge agent`, `supercharge browser`, and `supercharge eval`.
 - [Agent Client Protocol (ACP)](/docs/acp) for editor integration, stdio/WebSocket transports, session lifecycle, authentication, and extensions.
 - [Slash commands](/docs/slash) for everything you type after `/`.
 - [Keys](/docs/keys) for the TUI.
 - [Sessions](/docs/sessions), [Permissions](/docs/permissions), [Config](/docs/config), [Memory](/docs/memory), [Extensions](/docs/extensions).
 - [Run modes](/docs/modes) to choose between the terminal UI, one-shot prompts, ACP, and the HTTP inbox.
+- [Custom agents](/docs/agents) for `/new_agent`, the `/agents` form, and Shift+Tab.
 
-These pages were last written for CLI **1.3.33**. That stamp is also at the top of the docs sidebar. A published installer can be older. Check what you have with `supercharge --version`.
+These pages were last written for CLI **1.4.5**. That stamp is also at the top of the docs sidebar. A published installer can be older. Check what you have with `supercharge --version`.
