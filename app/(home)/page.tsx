@@ -1,63 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Bot, Zap, Download, Terminal, Cpu, Globe, Sparkles, Rocket, Shield, Clock, Smartphone } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { ArrowRight, Download, Smartphone } from 'lucide-react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { androidUniversal, desktopDownloads, serverDownloads, studioLatestDownload, studioRelease } from '@/lib/studio-downloads';
-
-// Animated background orbs component - NO random values to avoid hydration mismatch
-function FloatingOrbs() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Main orange glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-orange-600/20 rounded-full blur-[120px] animate-pulse-slow" />
-
-      {/* Floating orbs - using orange theme only */}
-      <div className="absolute top-20 left-[10%] w-72 h-72 bg-orange-500/10 rounded-full blur-3xl animate-float-1" />
-      <div className="absolute top-40 right-[15%] w-96 h-96 bg-orange-400/10 rounded-full blur-3xl animate-float-2" />
-      <div className="absolute bottom-20 left-[20%] w-64 h-64 bg-amber-500/10 rounded-full blur-3xl animate-float-3" />
-      <div className="absolute bottom-40 right-[10%] w-80 h-80 bg-orange-400/10 rounded-full blur-3xl animate-float-4" />
-
-      {/* Static particle dots - fixed positions to avoid hydration mismatch */}
-      <div className="absolute w-1 h-1 bg-orange-500/40 rounded-full animate-particle left-[10%] top-[20%]" style={{ animationDelay: '0s' }} />
-      <div className="absolute w-1 h-1 bg-orange-500/40 rounded-full animate-particle left-[25%] top-[15%]" style={{ animationDelay: '0.5s' }} />
-      <div className="absolute w-1 h-1 bg-orange-500/40 rounded-full animate-particle left-[40%] top-[30%]" style={{ animationDelay: '1s' }} />
-      <div className="absolute w-1 h-1 bg-orange-500/40 rounded-full animate-particle left-[55%] top-[10%]" style={{ animationDelay: '1.5s' }} />
-      <div className="absolute w-1 h-1 bg-orange-500/40 rounded-full animate-particle left-[70%] top-[25%]" style={{ animationDelay: '2s' }} />
-      <div className="absolute w-1 h-1 bg-orange-500/40 rounded-full animate-particle left-[85%] top-[20%]" style={{ animationDelay: '2.5s' }} />
-      <div className="absolute w-1 h-1 bg-orange-500/40 rounded-full animate-particle left-[15%] top-[60%]" style={{ animationDelay: '3s' }} />
-      <div className="absolute w-1 h-1 bg-orange-500/40 rounded-full animate-particle left-[30%] top-[70%]" style={{ animationDelay: '3.5s' }} />
-      <div className="absolute w-1 h-1 bg-orange-500/40 rounded-full animate-particle left-[60%] top-[65%]" style={{ animationDelay: '4s' }} />
-      <div className="absolute w-1 h-1 bg-orange-500/40 rounded-full animate-particle left-[80%] top-[55%]" style={{ animationDelay: '4.5s' }} />
-    </div>
-  );
-}
-
-// Typewriter effect hook
-function useTypewriter(text: string, speed: number = 100) {
-  const [displayText, setDisplayText] = useState('');
-  const [isComplete, setIsComplete] = useState(false);
-
-  useEffect(() => {
-    let i = 0;
-    setDisplayText('');
-    setIsComplete(false);
-
-    const timer = setInterval(() => {
-      if (i < text.length) {
-        setDisplayText(text.slice(0, i + 1));
-        i++;
-      } else {
-        setIsComplete(true);
-        clearInterval(timer);
-      }
-    }, speed);
-
-    return () => clearInterval(timer);
-  }, [text, speed]);
-
-  return { displayText, isComplete };
-}
 
 // Intersection observer hook for scroll animations
 const scrollObservers = new WeakMap<object, IntersectionObserver>();
@@ -84,40 +30,6 @@ function Reveal({ className, children }: { className: string; children: ReactNod
   return (
     <div ref={setNode} className={`${className} transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
       {children}
-    </div>
-  );
-}
-
-// Marquee component for tech stack
-function TechMarquee() {
-  const items = [
-    { icon: Terminal, text: 'supercharge' },
-    { icon: Cpu, text: 'Rust CLI' },
-    { icon: Globe, text: 'ACP server' },
-    { icon: Bot, text: 'Docs AI' },
-    { icon: Zap, text: 'Inbox daemon' },
-    { icon: Shield, text: 'Bring your own key' },
-    { icon: Rocket, text: 'Subagents' },
-    { icon: Clock, text: 'Curated memory' },
-  ];
-
-  return (
-    <div className="relative overflow-hidden py-8">
-      {/* Gradient overlays */}
-      <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-black to-transparent z-10" />
-      <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-black to-transparent z-10" />
-
-      <div className="flex animate-marquee">
-        {[...items, ...items].map((item, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-3 mx-8 px-6 py-3 bg-zinc-900/50 border border-zinc-800 rounded-full backdrop-blur-sm hover:border-orange-500/50 hover:bg-zinc-800/50 transition-all cursor-default group"
-          >
-            <item.icon className="w-5 h-5 text-orange-500 group-hover:scale-110 transition-transform" />
-            <span className="text-lg font-medium text-zinc-300 whitespace-nowrap group-hover:text-white transition-colors">{item.text}</span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
@@ -164,34 +76,22 @@ function InstallCommands() {
     },
   ].sort((a, b) => (a.kind === os ? -1 : b.kind === os ? 1 : 0));
 
+  const active = cards[0];
   return (
-    <div className="relative z-10 mt-8 w-full max-w-3xl overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 text-left shadow-none">
-      <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
-        <p className="font-mono text-xs text-zinc-400">
-          {ready ? (os === 'windows' ? 'Windows' : 'macOS or Linux') : 'Install'}
-        </p>
-        <p className="font-mono text-[11px] text-zinc-600">superchargeai.in</p>
-      </div>
-      {cards.map((card, index) => (
-        <button
-          key={card.kind}
-          type="button"
-          onClick={() => copy(card.kind)}
-          className={`flex w-full items-center gap-4 px-4 py-3 text-left ${index === 0 ? 'bg-orange-500/5 hover:bg-orange-500/10' : 'border-t border-zinc-800 hover:bg-zinc-900'}`}
-        >
-          <div className="min-w-0 flex-1">
-            <p className="mb-1 font-mono text-[11px] uppercase tracking-wide text-zinc-500">
-              {index === 0 ? 'This computer' : 'Other'} · {card.label}
-            </p>
-            <pre className="overflow-x-auto font-mono text-[13px] leading-6 text-orange-200">
-              <code className="whitespace-nowrap">{card.command}</code>
-            </pre>
-          </div>
-          <span className="shrink-0 font-mono text-xs text-zinc-400">
-            {copied === card.kind ? 'Copied' : 'Copy'}
-          </span>
-        </button>
-      ))}
+    <div className="mt-8 flex w-full max-w-3xl items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] py-2 pl-4 pr-2">
+      <button
+        type="button"
+        onClick={() => setOs(os === 'windows' ? 'unix' : 'windows')}
+        className="shrink-0 rounded-full px-2 py-1 font-mono text-[11px] text-zinc-400 hover:text-white"
+      >
+        {ready ? (os === 'windows' ? 'ps1' : 'bash') : '…'}
+      </button>
+      <button type="button" onClick={() => copy(active.kind)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
+        <code className="truncate font-mono text-sm text-orange-100">{active.command}</code>
+        <span className="ml-auto shrink-0 rounded-full bg-orange-500 px-3 py-1.5 text-xs font-semibold text-black">
+          {copied === active.kind ? 'Copied' : 'Copy'}
+        </span>
+      </button>
     </div>
   );
 }
@@ -210,205 +110,138 @@ const capabilities = [
   { title: 'Extensions', command: '/mcps', detail: 'MCP servers, skills, plugins, and hooks. Project rules live in AGENTS.md.', href: '/docs/extensions' },
 ];
 
-export default function HomePage() {
-  const { displayText, isComplete } = useTypewriter('Keeps the key.', 70);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+function useTypewriter(text: string, speed = 55) {
+  const [displayText, setDisplayText] = useState('');
+  const [isComplete, setIsComplete] = useState(false);
 
-  // Parallax mouse effect
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (heroRef.current) {
-        const rect = heroRef.current.getBoundingClientRect();
-        setMousePos({
-          x: (e.clientX - rect.left - rect.width / 2) / 50,
-          y: (e.clientY - rect.top - rect.height / 2) / 50,
-        });
+    let i = 0;
+    setDisplayText('');
+    setIsComplete(false);
+    const timer = setInterval(() => {
+      if (i < text.length) {
+        setDisplayText(text.slice(0, i + 1));
+        i++;
+      } else {
+        setIsComplete(true);
+        clearInterval(timer);
       }
-    };
+    }, speed);
+    return () => clearInterval(timer);
+  }, [text, speed]);
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+  return { displayText, isComplete };
+}
+
+const steps = [
+  { n: "01", title: "Install", body: "One command. The binary lands in ~/.local/bin as supercharge.", href: "/docs/install" },
+  { n: "02", title: "Connect a model", body: "/setup takes a key, or a browser sign-in for Mistral, Nous, OpenCode Go, and OpenCode Zen.", href: "/docs/setup" },
+  { n: "03", title: "Work in the repo", body: "Shift+Tab walks Agent, Plan, Ask, the agents you wrote, Always-Approve, and Auto-Review.", href: "/docs/agents" },
+];
+
+const modes = ['Agent', 'Plan', 'Ask', 'your agent', 'Always-Approve', 'Auto-Review'];
+
+function SessionPanel() {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => setIndex((value) => (value + 1) % modes.length), 1400);
+    return () => clearInterval(timer);
   }, []);
-
   return (
-    <div className="flex flex-col items-center justify-center w-full overflow-hidden bg-black text-zinc-100">
-      {/* Custom animations styles */}
-      <style jsx global>{`
-        @keyframes float-1 {
-          0%, 100% { transform: translate(0, 0) rotate(0deg); }
-          25% { transform: translate(30px, -30px) rotate(5deg); }
-          50% { transform: translate(-20px, 20px) rotate(-5deg); }
-          75% { transform: translate(40px, 10px) rotate(3deg); }
-        }
-        @keyframes float-2 {
-          0%, 100% { transform: translate(0, 0) rotate(0deg); }
-          33% { transform: translate(-40px, 30px) rotate(-5deg); }
-          66% { transform: translate(30px, -20px) rotate(5deg); }
-        }
-        @keyframes float-3 {
-          0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(50px, -40px); }
-        }
-        @keyframes float-4 {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          50% { transform: translate(-30px, 30px) scale(1.1); }
-        }
-        @keyframes particle {
-          0%, 100% { opacity: 0; transform: translateY(0) scale(0); }
-          10% { opacity: 1; transform: translateY(0) scale(1); }
-          90% { opacity: 1; transform: translateY(-100px) scale(1); }
-          100% { opacity: 0; transform: translateY(-100px) scale(0); }
-        }
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 0.2; transform: translate(-50%, 0) scale(1); }
-          50% { opacity: 0.35; transform: translate(-50%, 0) scale(1.1); }
-        }
-        @keyframes gradient-rotate {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        @keyframes shimmer {
-          0% { background-position: -200% center; }
-          100% { background-position: 200% center; }
-        }
-        @keyframes glow-pulse {
-          0%, 100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.3), 0 0 40px rgba(249, 115, 22, 0.1); }
-          50% { box-shadow: 0 0 30px rgba(249, 115, 22, 0.5), 0 0 60px rgba(249, 115, 22, 0.2); }
-        }
-        @keyframes text-glow {
-          0%, 100% { text-shadow: 0 0 20px rgba(249, 115, 22, 0.5), 0 0 40px rgba(249, 115, 22, 0.3); }
-          50% { text-shadow: 0 0 30px rgba(249, 115, 22, 0.8), 0 0 60px rgba(249, 115, 22, 0.5); }
-        }
-        @keyframes fade-in-up {
-          0% { opacity: 0; transform: translateY(30px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes scale-in {
-          0% { opacity: 0; transform: scale(0.9); }
-          100% { opacity: 1; transform: scale(1); }
-        }
-        @keyframes border-dance {
-          0%, 100% { border-color: rgba(249, 115, 22, 0.3); }
-          50% { border-color: rgba(251, 191, 36, 0.3); }
-        }
-        
-        .animate-float-1 { animation: float-1 20s ease-in-out infinite; }
-        .animate-float-2 { animation: float-2 25s ease-in-out infinite; }
-        .animate-float-3 { animation: float-3 18s ease-in-out infinite; }
-        .animate-float-4 { animation: float-4 22s ease-in-out infinite; }
-        .animate-particle { animation: particle 5s ease-in-out infinite; }
-        .animate-pulse-slow { animation: pulse-slow 4s ease-in-out infinite; }
-        .animate-gradient-rotate { animation: gradient-rotate 3s linear infinite; }
-        .animate-marquee { animation: marquee 30s linear infinite; }
-        .animate-shimmer {
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-          background-size: 200% 100%;
-          animation: shimmer 2s infinite;
-        }
-        .animate-glow-pulse { animation: glow-pulse 2s ease-in-out infinite; }
-        .animate-text-glow { animation: text-glow 2s ease-in-out infinite; }
-        .animate-fade-in-up { animation: fade-in-up 0.8s ease-out forwards; }
-        .animate-scale-in { animation: scale-in 0.6s ease-out forwards; }
-        .animate-border-dance { animation: border-dance 3s ease-in-out infinite; }
-        
-        .text-gradient-animate {
-          background: linear-gradient(90deg, #fff, #fdba74, #fff, #fdba74, #fff);
-          background-size: 200% auto;
-          -webkit-background-clip: text;
-          background-clip: text;
-          animation: shimmer 3s linear infinite;
-        }
-      `}</style>
-
-      {/* 1. Hero Section */}
-      <div
-        ref={heroRef}
-        className="relative w-full max-w-7xl mx-auto px-4 pt-24 pb-20 md:pt-36 md:pb-32 flex flex-col items-center text-center z-10"
-      >
-        <FloatingOrbs />
-
-        {/* VectraDocs Logo */}
-        <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-          <span className="text-2xl md:text-3xl font-bold tracking-tight">
-            <span className="text-white">Super</span>
-            <span className="text-orange-500">charge</span>
-          </span>
-        </div>
-
-        {/* Badge: Credits - Animated entrance */}
-        <div
-          className="mb-10 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900/80 border border-zinc-800 text-[12px] font-mono text-zinc-400 backdrop-blur-sm animate-fade-in-up animate-border-dance"
-          style={{ animationDelay: '0.2s' }}
-        >
-          <Terminal className="w-4 h-4 text-orange-500 animate-pulse" />
-          <span>Built by <strong className="text-zinc-200">R3AP3R Editz</strong> · free, bring your own key</span>
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-        </div>
-
-        {/* Headline with parallax */}
-        <h1
-          className="text-5xl md:text-8xl font-bold tracking-tight mb-8 animate-fade-in-up"
-          style={{
-            animationDelay: '0.4s',
-            transform: `translate(${mousePos.x}px, ${mousePos.y}px)`,
-            transition: 'transform 0.3s ease-out',
-          }}
-        >
-          <span className="bg-gradient-to-b from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent">
-            The coding agent that
-          </span>
-          <br />
-          <span className="text-orange-500 animate-text-glow inline-block">
-            {displayText}
-            {!isComplete && <span className="animate-pulse">|</span>}
-          </span>
-        </h1>
-
-        {/* Subheadline */}
-        <p
-          className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-12 leading-relaxed animate-fade-in-up opacity-0"
-          style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}
-        >
-          A free, fully bring-your-own-key Rust coding agent. In <span className="font-mono text-zinc-200">/setup</span> you choose Chat Completions, Messages, or Responses, then use the terminal, a script, or an inbox.
+    <div className="overflow-hidden rounded-3xl border border-white/10 bg-zinc-950 shadow-[0_40px_120px_-48px_rgba(249,115,22,0.7)]">
+      <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
+        <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
+        <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
+        <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
+        <span className="ml-2 font-mono text-xs text-zinc-500">supercharge</span>
+      </div>
+      <div className="space-y-4 px-5 py-6 font-mono text-sm">
+        <p className="text-zinc-500">$ supercharge</p>
+        <p className="text-zinc-300">/setup <span className="text-zinc-500">· key stays on this machine</span></p>
+        <p>
+          <span className="text-zinc-500">Switched to mode: </span>
+          <span className="text-orange-300">{modes[index]}</span>
         </p>
-
-        <InstallCommands />
-
-        {/* CTA Buttons with glow effects */}
-        <div
-          className="mt-8 flex flex-col sm:flex-row items-center gap-4 animate-fade-in-up opacity-0"
-          style={{ animationDelay: '0.8s', animationFillMode: 'forwards' }}
-        >
-          <Link
-            href="/docs"
-            className="group relative flex items-center gap-2 px-8 py-3 bg-orange-600 hover:bg-orange-500 text-white rounded-full font-semibold transition-colors overflow-hidden"
-          >
-            <span className="relative z-10">Read the docs</span>
-            <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute inset-0 animate-shimmer" />
-          </Link>
-          <Link
-            href="/download"
-            className="group flex items-center gap-2 px-10 py-4 bg-zinc-900/80 border border-zinc-700 hover:border-orange-500/50 hover:bg-zinc-800 text-zinc-300 rounded-full font-semibold transition-all duration-300 backdrop-blur-sm"
-          >
-            <Download className="w-5 h-5 transition-transform group-hover:translate-y-0.5" />
-            <span>Download Studio</span>
-          </Link>
-          <Link
-            href="/donate"
-            className="px-8 py-3 rounded-full border border-zinc-700 text-zinc-300 font-semibold hover:border-orange-500/50 hover:text-white transition-colors"
-          >
-            Donate
-          </Link>
+        <div className="flex flex-wrap gap-2 pt-2">
+          {modes.map((mode, modeIndex) => (
+            <span
+              key={mode}
+              className={`rounded-full px-2.5 py-1 text-xs transition-colors duration-500 ${modeIndex === index ? 'bg-orange-500 text-black' : 'bg-white/5 text-zinc-400'}`}
+            >
+              {mode}
+            </span>
+          ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+export default function HomePage() {
+  const { displayText, isComplete } = useTypewriter('runs on your machine.');
+  return (
+    <div className="flex w-full flex-col bg-black text-zinc-100">
+      <style jsx global>{`
+        @keyframes rise {
+          from { opacity: 0; transform: translateY(18px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes drift {
+          0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+          50% { transform: translate3d(24px, -18px, 0) scale(1.06); }
+        }
+        @keyframes caret {
+          50% { opacity: 0; }
+        }
+        .rise { animation: rise 0.7s ease both; }
+        .drift { animation: drift 14s ease-in-out infinite; }
+        .caret { animation: caret 1s steps(1) infinite; }
+      `}</style>
+      <header className="relative w-full overflow-hidden px-6 pb-16 pt-14 md:px-10 lg:px-16 lg:pb-24 lg:pt-20">
+        <div className="pointer-events-none absolute left-[-8%] top-[-10%] h-[28rem] w-[28rem] rounded-full bg-orange-600/20 blur-3xl drift" />
+        <div className="relative grid items-center gap-12 lg:grid-cols-[1.15fr_0.85fr]">
+          <div>
+            <p className="rise font-mono text-xs uppercase tracking-[0.22em] text-orange-400">CLI 1.4.5 · no subscription</p>
+            <h1 className="rise mt-5 text-6xl font-semibold leading-[0.95] tracking-tight text-white md:text-8xl" style={{ animationDelay: '0.08s' }}>
+              A coding agent that
+              <span className="mt-2 block text-orange-500">
+                {displayText}
+                {!isComplete && <span className="caret">|</span>}
+              </span>
+            </h1>
+            <p className="rise mt-6 max-w-xl text-lg leading-8 text-zinc-400" style={{ animationDelay: '0.16s' }}>
+              It reads the repo, edits files, and runs commands. The model key stays in <span className="font-mono text-zinc-200">/setup</span>.
+            </p>
+            <div className="rise" style={{ animationDelay: '0.22s' }}>
+              <InstallCommands />
+            </div>
+            <div className="rise mt-5 flex flex-wrap items-center gap-5 text-sm" style={{ animationDelay: '0.3s' }}>
+              <Link href="/docs" className="inline-flex items-center gap-2 font-medium text-white">
+                Read the docs <ArrowRight className="h-4 w-4" />
+              </Link>
+              <a href="#studio-downloads" className="text-zinc-400 hover:text-white">Studio</a>
+              <Link href="/donate" className="text-zinc-400 hover:text-white">Donate</Link>
+            </div>
+          </div>
+          <div className="rise" style={{ animationDelay: '0.2s' }}>
+            <SessionPanel />
+          </div>
+        </div>
+      </header>
+
+      <section className="grid border-y border-white/10 md:grid-cols-3">
+        {steps.map((step, index) => (
+          <Link key={step.n} href={step.href} className="group px-6 py-8 md:px-10 lg:px-16" style={{ animationDelay: `${0.1 + index * 0.08}s` }}>
+            <p className="font-mono text-3xl text-white/15 transition group-hover:text-orange-500/80">{step.n}</p>
+            <h2 className="mt-4 text-lg font-medium text-white">{step.title}</h2>
+            <p className="mt-2 max-w-sm text-sm leading-6 text-zinc-500">{step.body}</p>
+          </Link>
+        ))}
+      </section>
+
+      <section className="grid items-center gap-8 px-6 py-16 md:px-10 lg:grid-cols-[1.4fr_0.8fr] lg:px-16">
         <video
-          className="relative z-0 mt-16 w-full max-w-5xl overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950"
+          className="w-full overflow-hidden rounded-3xl border border-white/10 bg-zinc-950"
           src="/using-supercharge.mp4"
           autoPlay
           muted
@@ -416,21 +249,21 @@ export default function HomePage() {
           playsInline
           controls
         />
-      </div>
+        <div>
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-orange-400">In the terminal</p>
+          <h2 className="mt-3 text-4xl font-semibold tracking-tight text-white">Shift+Tab is the whole control.</h2>
+          <p className="mt-4 text-zinc-400">Agent, Plan, and Ask change the work. Always-Approve and Auto-Review change whether a tool asks you first. <span className="text-zinc-200">/new_agent</span> adds one of your own to that ring.</p>
+        </div>
+      </section>
 
-      <section className="relative z-10 w-full border-t border-zinc-900 px-6 py-20 lg:px-10" aria-labelledby="studio-downloads">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-10 text-center">
-            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/10 px-3 py-1 text-sm font-medium text-orange-400">
-              <Download className="h-4 w-4" />
-              Supercharge Studio · {studioRelease}
-            </span>
-            <h2 id="studio-downloads" className="mb-4 text-3xl font-bold text-white md:text-5xl">
-              Download Studio
-            </h2>
-            <p className="mx-auto max-w-xl text-zinc-400">
-              Studio is an app that runs on the CLI, so the CLI has to be installed for it to run. The mobile app connects to the PC app.
-            </p>
+      <section className="relative z-10 w-full border-t border-white/10 px-6 py-16 md:px-10 lg:px-16" aria-labelledby="studio-downloads">
+        <div className="w-full">
+          <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-orange-400">Studio · {studioRelease}</p>
+              <h2 id="studio-downloads" className="mt-2 text-4xl font-semibold tracking-tight text-white">The app on top of the CLI.</h2>
+            </div>
+            <p className="max-w-md text-sm leading-6 text-zinc-500">Install the CLI first. The phone talks to the computer.</p>
           </div>
           <div className="mb-10 grid items-start gap-4">
             <img
@@ -491,64 +324,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. Features Grid */}
-      <Reveal className="w-full px-6 py-20 border-t border-zinc-900 lg:px-10">
-        {/* Section header */}
-        <div className="text-center mb-16">
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-sm font-medium mb-4">
-            <Sparkles className="w-4 h-4" />
-            Features
-          </span>
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-            What the CLI can do
-          </h2>
-          <p className="text-zinc-400 max-w-xl mx-auto">
-            One binary. These are the ways it runs and the controls around it. Docs for CLI 1.4.5.
-          </p>
+      <Reveal className="w-full border-t border-white/10 px-6 py-16 md:px-10 lg:px-16">
+        <div className="mb-8 flex items-end justify-between">
+          <h2 className="text-3xl font-semibold tracking-tight text-white">Same binary, different doors.</h2>
+          <Link href="/docs/slash" className="hidden items-center gap-2 text-sm text-orange-300 md:inline-flex">
+            Slash commands <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="divide-y divide-white/10 border-y border-white/10">
           {capabilities.map((item) => (
-            <Link
-              key={item.title}
-              href={item.href}
-              className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-5 hover:border-orange-500/50"
-            >
-              <h3 className="text-lg font-semibold text-zinc-100">{item.title}</h3>
-              <p className="mt-3 overflow-x-auto font-mono text-xs text-orange-300">{item.command}</p>
-              <p className="mt-3 text-sm leading-6 text-zinc-400">{item.detail}</p>
+            <Link key={item.title} href={item.href} className="grid gap-2 py-5 transition-colors hover:bg-white/[0.03] md:grid-cols-[180px_220px_1fr] md:items-baseline md:gap-8 md:px-2">
+              <span className="font-medium text-white">{item.title}</span>
+              <span className="truncate font-mono text-sm text-orange-300">{item.command}</span>
+              <span className="text-sm leading-6 text-zinc-500">{item.detail}</span>
             </Link>
           ))}
         </div>
       </Reveal>
-
-      {/* 4. Updates Section */}
-      <Reveal className="w-full px-6 py-12 border-t border-zinc-900 lg:px-10">
-        <div className="group flex flex-col md:flex-row items-center justify-between gap-6 p-8 rounded-2xl bg-zinc-900/30 border border-zinc-800 hover:border-orange-500/30 transition-all duration-300 backdrop-blur-sm">
-          <div className="text-center md:text-left">
-            <h3 className="text-xl font-semibold text-zinc-100 mb-2">
-              Provider, memory, commands
-            </h3>
-            <p className="text-zinc-400">/setup, slash commands, config, and the local daemon.</p>
-          </div>
-          <Link
-            href="/docs/setup"
-            className="group/btn flex items-center gap-2 px-8 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-full font-medium transition-all duration-300 hover:scale-105 border border-zinc-700 hover:border-orange-500/50"
-          >
-            Open setup docs
-            <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-      </Reveal>
-
-      {/* 5. Tech Stack Marquee */}
-      <div className="w-full border-t border-zinc-900 bg-zinc-950/50 py-8">
-        <div className="text-center mb-6">
-          <span className="text-zinc-600 text-sm uppercase tracking-widest">On this site</span>
-        </div>
-        <TechMarquee />
-      </div>
-
     </div>
   );
 }
