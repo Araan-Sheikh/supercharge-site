@@ -1,0 +1,71 @@
+---
+title: Supercharge Studio
+description: Desktop, Android, and the headless server that phones connect to
+---
+
+# Supercharge Studio
+
+Supercharge Studio is the window and the phone app for the same agent as the [CLI](/docs). It does not have its own model account. You still install the CLI, run `/setup`, and pay the provider you connected. Studio reads `~/.supercharge/` on the computer where the agent runs, so a chat you start in the terminal and a chat you start on the phone are the same session store.
+
+Three pieces ship together:
+
+| Piece | Where it runs | What it is |
+| --- | --- | --- |
+| Desktop app | Linux, macOS, Windows with a screen | A native window. It starts the agent for you. |
+| Android app | A phone | The remote control. It never runs the model itself. |
+| Server | A terminal-only Linux, macOS, or Windows machine | A small gateway. The phone pairs with it. It starts `supercharge agent serve`. |
+
+Download the newest files from the [Studio release](https://github.com/supercharge-cli/supercharge-studio/releases/latest). Names do not include a version, so the same link stays current.
+
+```text
+https://github.com/supercharge-cli/supercharge-studio/releases/latest/download/<file>
+```
+
+Check a running server with `supercharge-studio-server --version`. The desktop About line and the Android app version are the same release.
+
+## What the phone can do
+
+After a phone is paired it can:
+
+- list projects and open sessions that already exist on that computer
+- send prompts and watch the turn stream
+- answer permission requests (shell, file edits) from the phone
+- attach files. The gateway saves them on the computer and the agent reads those paths
+- export a chat or copy a share link. Pasting that link into another Studio message box opens the same conversation
+
+The phone does not store your provider key. The key stays in `~/.supercharge/config.toml` on the computer.
+
+## How a phone finds the computer
+
+Pairing prints one link:
+
+```text
+scstudio://pair?u=ws://<ip>:2420/gw&i=<id>&k=<key>&n=<name>&r=wss://relay.superchargeai.in/v1/connect/<host>
+```
+
+| Part | Meaning |
+| --- | --- |
+| `u` | Direct gateway, usually `ws://<lan-or-public-ip>:2420/gw`. |
+| `i` and `k` | One-time pairing id and key. The link expires in 120 seconds and works once. |
+| `n` | Name shown on the phone. Defaults to the hostname. |
+| `r` | Public relay. Present when the computer is in Public mode. |
+
+On the same Wi-Fi the phone uses `u`. From mobile data, or from another network, it uses `r`. The relay only forwards encrypted frames. It does not see prompts.
+
+The built-in relay is `wss://relay.superchargeai.in`. A desktop in Public mode and a server started with `--relay` or `SCS_RELAY` both use it unless you pass another URL.
+
+## Ports
+
+| Port | Who listens | Who connects |
+| --- | --- | --- |
+| `2420` | Studio gateway | The phone, when it is on a network that can reach this host. The gateway moves to the next free port up to `2430` if `2420` is taken, and remembers the choice. |
+| `127.0.0.1:2422` | Control socket | `supercharge-studio-server pair` on that same machine. Not exposed. |
+| `127.0.0.1:2419` | `supercharge agent serve` | Only the gateway. This is the [ACP WebSocket](/docs/acp). |
+
+A firewall can block `2420` and the phone can still work through the relay. Nothing on the public internet needs `2419` or `2422`.
+
+## Which page to read
+
+- [Desktop](/docs/studio-desktop) for Linux, macOS, and Windows with a screen.
+- [Android](/docs/studio-android) for the APK, pairing, and what the phone stores.
+- [Server](/docs/studio-server) for a VPS or any machine with only a terminal, including systemd.

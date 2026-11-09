@@ -26,18 +26,32 @@ export function CopyPageButton({ pageTitle, pageUrl }: CopyPageButtonProps) {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const getFullUrl = (): string => {
-        return window.location.href;
+    const pagePath = pageUrl.endsWith('/') ? pageUrl : pageUrl;
+    const markdownPath = pagePath.replace(/^\/docs/, '/docs-md') || '/docs-md';
+
+    const absolute = (path: string): string => {
+        return new URL(path, window.location.origin).href;
     };
 
-    const getPromptWithUrl = (): string => {
-        const url = getFullUrl();
-        return `I'm going to ask about this documentation page: "${pageTitle}"\n\nURL: ${url}\n\nPlease refer to this page for context.`;
+    const askPrompt = (): string => {
+        const url = absolute(pagePath);
+        const md = absolute(markdownPath);
+        return `Read this Supercharge documentation before you answer.\n\nTitle: ${pageTitle}\nPage: ${url}\nMarkdown (fetch this, it is the full page): ${md}\n\nUse that page as the source. If the fetch fails, say so.`;
     };
 
     const handleCopyPage = async () => {
         try {
-            const prompt = getPromptWithUrl();
+            const md = absolute(markdownPath);
+            let body = '';
+            try {
+                const res = await fetch(markdownPath);
+                if (res.ok) body = await res.text();
+            } catch {
+                body = '';
+            }
+            const prompt = body
+                ? `${askPrompt()}\n\n---\n\n${body}`
+                : `${askPrompt()}\n\nThe page text could not be copied. Fetch ${md}.`;
             await navigator.clipboard.writeText(prompt);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
@@ -48,29 +62,24 @@ export function CopyPageButton({ pageTitle, pageUrl }: CopyPageButtonProps) {
     };
 
     const handleViewAsMarkdown = () => {
-        // Open the llms.txt version of the page if available
-        const url = getFullUrl();
-        window.open(url, '_blank');
+        window.open(markdownPath, '_blank');
         setIsOpen(false);
     };
 
     const handleOpenInChatGPT = () => {
-        const url = getFullUrl();
-        const query = encodeURIComponent(`I'm going to ask about this documentation page: "${pageTitle}"\n\nURL: ${url}\n\nPlease read and refer to this page for context.`);
+        const query = encodeURIComponent(askPrompt());
         window.open(`https://chat.openai.com/?q=${query}`, '_blank');
         setIsOpen(false);
     };
 
     const handleOpenInClaude = () => {
-        const url = getFullUrl();
-        const query = encodeURIComponent(`Read from ${url} so I can ask questions about it.`);
+        const query = encodeURIComponent(askPrompt());
         window.open(`https://claude.ai/new?q=${query}`, '_blank');
         setIsOpen(false);
     };
 
     const handleOpenInPerplexity = () => {
-        const url = getFullUrl();
-        const query = encodeURIComponent(`${pageTitle} - ${url}`);
+        const query = encodeURIComponent(askPrompt());
         window.open(`https://www.perplexity.ai/search?q=${query}`, '_blank');
         setIsOpen(false);
     };

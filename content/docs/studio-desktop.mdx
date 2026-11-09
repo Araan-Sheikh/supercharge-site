@@ -1,0 +1,67 @@
+---
+title: Studio on the desktop
+description: Install Supercharge Studio on Linux, macOS, and Windows
+---
+
+# Studio on the desktop
+
+The desktop app is a native window around the CLI. Install the [CLI](/docs/install) first and finish `/setup` once in a terminal. Studio starts `supercharge agent serve` itself. It does not ask you to run that command.
+
+Release files:
+
+| System | File | How to install |
+| --- | --- | --- |
+| Linux x86_64, portable | `Supercharge-Studio-linux-x86_64.AppImage` | `chmod +x` the file and run it. |
+| Debian, Ubuntu, and other `.deb` systems | `supercharge-studio-linux-amd64.deb` | `sudo apt install ./supercharge-studio-linux-amd64.deb` |
+| Fedora and other RPM systems | `supercharge-studio-linux-x86_64.rpm` | `sudo dnf install ./supercharge-studio-linux-x86_64.rpm` |
+| macOS, Apple silicon and Intel | `Supercharge-Studio-macos-universal.dmg` | Open the disk image and drag Studio to Applications. |
+| Windows 64-bit | `Supercharge-Studio-windows-x64-setup.exe` | Run the setup. |
+| Windows 64-bit, MSI | `Supercharge-Studio-windows-x64.msi` | `msiexec /i Supercharge-Studio-windows-x64.msi` |
+
+Prefix every file with:
+
+```text
+https://github.com/supercharge-cli/supercharge-studio/releases/latest/download/
+```
+
+## Linux libraries
+
+The window uses the system WebKit. On Debian and Ubuntu install WebKitGTK 4.1 if the app opens a blank window or exits immediately:
+
+```bash
+sudo apt install libwebkit2gtk-4.1-0 libayatana-appindicator3-1
+```
+
+Fedora uses the matching `webkit2gtk4.1` package. Wayland and X11 both work. The tray icon uses Ayatana AppIndicator.
+
+If `supercharge` is only on your user `PATH` (`~/.local/bin`), start Studio from a login session where that directory is already on `PATH`. A desktop entry started before the shell profile runs will not see a binary that exists only in `~/.local/bin`. Copy it to `/usr/local/bin` when you want every account to find it:
+
+```bash
+sudo install -m 755 "$HOME/.local/bin/supercharge" /usr/local/bin/supercharge
+```
+
+## macOS
+
+The universal disk image runs on Apple silicon and Intel. The first launch is a normal Gatekeeper prompt for an app outside the App Store. The CLI still has to be on `PATH` for the user who opens Studio. Homebrew and the curl installer both put it in `~/.local/bin`, which macOS GUI apps do not always inherit. The same `/usr/local/bin` copy above fixes that.
+
+## Windows
+
+Use the `.exe` setup for a normal install, or the `.msi` when you deploy from Intune or Group Policy. Git Bash can install the CLI with `install.sh`. PowerShell can install it with `install.ps1`. Studio looks up `supercharge` on the user `PATH`. Open a new terminal after the installer so the directory is registered, then start Studio.
+
+Windows Server with no desktop should use the [headless server](/docs/studio-server), not this window.
+
+## Pairing a phone from the desktop
+
+In the window, choose **Public** when the phone is not on the same network. Public mode registers this computer on `wss://relay.superchargeai.in` and shows a QR. **Local** keeps the gateway on the LAN only. The QR and the `scstudio://` link are described on [Supercharge Studio](/docs/studio).
+
+Approving a phone lets it see sessions, send prompts, and answer permission requests. Revoke a device from the same pairing screen. Revoking does not delete sessions.
+
+## What it writes
+
+Desktop Studio uses the CLI's files. Sessions stay in `~/.supercharge/sessions/`. Provider settings stay in `~/.supercharge/config.toml`. See [Config](/docs/config) and [Sessions](/docs/sessions).
+
+The gateway's own pairing list is separate and small. The desktop keeps it in its app data directory. You do not edit that file. Use the pairing screen to add and remove phones.
+
+## Updates
+
+Download the latest file from the same release URL and install it over the old one. The CLI updates on its own schedule with the installer on [Install](/docs/install). Studio and the CLI versions do not have to match, but a very old CLI can reject the ACP methods a new Studio sends. Update the CLI when Studio says it cannot start the agent.

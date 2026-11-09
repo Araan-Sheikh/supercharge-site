@@ -1,0 +1,54 @@
+---
+title: Studio on Android
+description: Install the Android app and pair it with a computer
+---
+
+# Studio on Android
+
+The Android app is a remote control. The agent, the provider key, and the files stay on the computer you pair. The phone can be on Wi-Fi or on mobile data. Mobile data needs the computer in Public mode, or a [server](/docs/studio-server) started with the relay.
+
+## Install
+
+The universal APK is signed and runs on every current phone, ARM and x86:
+
+```text
+https://github.com/supercharge-cli/supercharge-studio/releases/latest/download/supercharge-studio-android-universal.apk
+```
+
+Download it on the phone, or copy it over USB. Android asks you to allow installs from the browser or from the Files app the first time. That setting is per app (Chrome, Files), not a single global switch on newer Android versions.
+
+There is no account inside the APK. Opening it shows **Connect**, with two actions:
+
+- **Scan QR code** reads the code from the desktop pairing screen or from `supercharge-studio-server pair` in a terminal.
+- **Paste link** takes the `scstudio://pair?...` line under the QR. Use this when the terminal QR is too dense to scan, which is common over SSH.
+
+The link is single-use and expires in 120 seconds. If the phone says the code is expired, run pair again and paste the new line.
+
+The desktop or the server then asks you to approve the device name, for example `RMX5398` or `Goat`. Until you answer yes, the phone waits. `--yes` on the server approves without that prompt. Only do that on a machine you control.
+
+## After it is paired
+
+The phone shows the projects and sessions on that computer. Sending a message starts a turn on the computer. Permission prompts that the CLI would ask in the terminal appear on the phone. You can allow or deny them there.
+
+A paired phone survives closing the app. It does not survive uninstalling the app, clearing the app's storage, or revoking the device on the computer. Pair again in those cases. Old sessions on the computer are untouched.
+
+One phone can keep more than one computer. Each computer has its own pairing. The computer list is on the phone. The device list is on the computer (`supercharge-studio-server devices`, or the desktop pairing screen).
+
+## What the phone stores
+
+The phone stores the computer's gateway address, the relay address, and the device key from the pairing link. It does not store `~/.supercharge/config.toml` and it does not store your provider key.
+
+Clearing storage or uninstalling deletes those keys. Revoke the device on the computer as well, so a backup of the phone cannot reconnect with the old key.
+
+## When the phone says connection closed (1006)
+
+`1006` means the websocket dropped before a normal close. Work down this list:
+
+1. The computer's gateway is running. On a server, `systemctl status supercharge-studio-server` is active and the log says `relay: online` if you depend on the relay.
+2. Only one gateway is running. A second `supercharge-studio-server` on the same host fights for the relay and the log says `relay: replaced`.
+3. The agent is running and the gateway knows its secret. The gateway connects to `ws://127.0.0.1:2419/ws?server-key=...`. If an old `supercharge agent serve` is still bound to `2419` with a different secret, pairing can succeed and the next screen still closes with `1006`. Stop the old agent, set `SUPERCHARGE_AGENT_SECRET` to the secret that agent was started with, and restart the gateway. Details are on [Server](/docs/studio-server).
+4. From mobile data, Public mode or `SCS_RELAY` is set. A direct `ws://` address on a private LAN is not reachable from the carrier network. The relay is.
+
+## Updates
+
+Install the new universal APK over the old one. Android keeps the app's storage, so paired computers stay paired. You do not need a new QR unless you cleared storage or revoked the device.

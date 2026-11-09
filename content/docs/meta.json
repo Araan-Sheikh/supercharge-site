@@ -14,6 +14,11 @@
     "memory",
     "extensions",
     "modes",
-    "agents"
+    "agents",
+    "---Studio---",
+    "studio",
+    "studio-desktop",
+    "studio-android",
+    "studio-server"
   ]
 }

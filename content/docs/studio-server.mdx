@@ -1,0 +1,160 @@
+---
+title: Studio server
+description: Headless gateway for a VPS or any machine with only a terminal
+---
+
+# Studio server
+
+`supercharge-studio-server` is the piece the desktop app embeds, shipped as its own binary for a machine with no screen. A VPS, a workstation you reach over SSH, and a Windows host you manage from PowerShell all use it the same way. The phone pairs with this process. This process starts the CLI agent and sits in front of it.
+
+Install the [CLI](/docs/install) on that machine before you start the server. The server looks up `supercharge` on `PATH`.
+
+## Download
+
+| Machine | File |
+| --- | --- |
+| Linux x86_64 | `supercharge-studio-server-linux-x86_64` |
+| Linux ARM64 | `supercharge-studio-server-linux-arm64` |
+| macOS Apple silicon | `supercharge-studio-server-macos-arm64` |
+| Windows 64-bit | `supercharge-studio-server-windows-x64.exe` |
+| systemd unit | `supercharge-studio-server.service` |
+
+```bash
+curl -fsSL -o /tmp/supercharge-studio-server \
+  https://github.com/supercharge-cli/supercharge-studio/releases/latest/download/supercharge-studio-server-linux-x86_64
+sudo install -m 755 /tmp/supercharge-studio-server /usr/local/bin/supercharge-studio-server
+```
+
+On Windows, save `supercharge-studio-server-windows-x64.exe` somewhere on `PATH`.
+
+`supercharge-studio-server --help` lists every flag. The environment variable for each flag is in brackets in that help text.
+
+## Try it in the foreground
+
+On a VPS the phone is not on the same LAN, so turn the relay on:
+
+```bash
+supercharge-studio-server run --spawn-agent --relay wss://relay.superchargeai.in
+```
+
+Leave that process running. In a second SSH session:
+
+```bash
+supercharge-studio-server pair
+```
+
+That prints a QR and one `scstudio://pair?...` line. On the phone, paste the line or scan the QR. The server asks you to approve the device name. `pair --yes` approves without asking.
+
+`--spawn-agent` runs `supercharge agent serve --bind 127.0.0.1:2419`. If `SUPERCHARGE_AGENT_SECRET` is empty, the server invents a secret for that process only. A later restart invents a new one, and an agent left behind from the previous process will reject it. Set a secret when you install the service. Any long random string is fine. Reuse it across restarts.
+
+```bash
+export SUPERCHARGE_AGENT_SECRET="$(openssl rand -hex 16)"
+```
+
+Put the same value in the systemd unit below. Do not publish it. It is the key the gateway uses to talk to the agent on localhost.
+
+## systemd on Ubuntu
+
+This unit runs the server as its own user, keeps the relay on, and caps a runaway turn at 256 MB of RAM and half of one CPU core. Idle use is a few megabytes for the gateway plus the agent process, and about no CPU. The cap only matters while a turn is running local tools.
+
+```bash
+sudo useradd --system --home-dir /var/lib/supercharge-studio-server --create-home supercharge || true
+sudo install -m 755 "$HOME/.local/bin/supercharge" /usr/local/bin/supercharge
+sudo tee /etc/systemd/system/supercharge-studio-server.service >/dev/null <<'EOF'
+[Unit]
+Description=Supercharge Studio Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=supercharge
+Environment=SCS_DATA=/var/lib/supercharge-studio-server
+Environment=SCS_BIND=0.0.0.0:2420
+Environment=SCS_SPAWN_AGENT=1
+Environment=SCS_RELAY=wss://relay.superchargeai.in
+Environment=SUPERCHARGE_AGENT_SECRET=replace-with-a-long-random-string
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+StateDirectory=supercharge-studio-server
+ExecStart=/usr/local/bin/supercharge-studio-server run
+Restart=on-failure
+RestartSec=3
+MemoryMax=256M
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target
+EOF
+sudo systemctl daemon-reload
+sudo systemctl enable --now supercharge-studio-server
+```
+
+Replace `SUPERCHARGE_AGENT_SECRET` before you start the unit. `StateDirectory` creates `/var/lib/supercharge-studio-server` and systemd starts the process with that as the state directory. `SCS_DATA` points the pairing file at the same place.
+
+Pair against that directory, from root or any user that can read it:
+
+```bash
+sudo supercharge-studio-server pair --data-dir /var/lib/supercharge-studio-server
+```
+
+`pair` with no `--data-dir` reads your own `~/.config/supercharge-studio-server`. The running service uses `/var/lib/supercharge-studio-server`. Those are different control tokens. Pairing the wrong directory returns `err auth` and does not change the phone.
+
+Useful checks:
+
+```bash
+systemctl status supercharge-studio-server --no-pager
+journalctl -u supercharge-studio-server -n 30 --no-pager
+sudo supercharge-studio-server devices --data-dir /var/lib/supercharge-studio-server
+ss -ltnp | grep -E '2420|2422|2419'
+```
+
+A healthy log looks like this:
+
+```text
+Supercharge Studio Server 1.0.x — gateway ws://<public-ip>:2420/gw → agent ws://127.0.0.1:2419
+relay: online
+```
+
+`gateway: port 2420 unavailable` means another server is still running. `control socket 127.0.0.1:2422 unavailable` means `pair` will talk to that other process. Stop the extra one. `relay: replaced` means two servers registered the same host id. Keep one.
+
+`sudo: unable to resolve host <name>` is a hostname that is not in `/etc/hosts`. It does not stop the service. Add `127.0.1.1 <name>` if you want the warning gone.
+
+## Commands
+
+```text
+supercharge-studio-server run [--spawn-agent] [--relay URL] [--bind ADDR] [--data-dir DIR]
+supercharge-studio-server pair [--data-dir DIR] [--yes]
+supercharge-studio-server devices [--data-dir DIR]
+supercharge-studio-server revoke <id> [--data-dir DIR]
+```
+
+| Variable | Flag | Default |
+| --- | --- | --- |
+| `SCS_BIND` | `--bind` | `0.0.0.0:2420` |
+| `SCS_RELAY` | `--relay` | empty. Set `wss://relay.superchargeai.in` for a VPS. |
+| `SCS_REACH=public` | `--public` | uses the built-in relay when `SCS_RELAY` is empty |
+| `SCS_DATA` | `--data-dir` | `~/.config/supercharge-studio-server` |
+| `SCS_NAME` | `--name` | hostname, shown on the phone |
+| `SCS_SPAWN_AGENT=1` | `--spawn-agent` | off. Turn it on unless you already run `supercharge agent serve`. |
+| `SCS_AGENT` | `--agent` | `ws://127.0.0.1:2419` |
+| `SUPERCHARGE_AGENT_SECRET` | `--agent-secret` | empty until the server invents one |
+| `SCS_CONTROL` | `--control` | `127.0.0.1:2422` |
+| `SUPERCHARGE_BIN` | | `supercharge` |
+
+`devices` prints each paired id, the name the phone sent, when it was paired, and when it was last seen. `revoke <id>` removes that device. The phone has to pair again. Sessions on disk stay.
+
+## macOS and Windows services
+
+The macOS and Windows binaries take the same flags and the same variables.
+
+On macOS, a `launchd` agent with `KeepAlive` true and those variables in `EnvironmentVariables` is the match for systemd. Run it as the user who owns `~/.supercharge/`, or set `SUPERCHARGE_HOME` to that directory.
+
+On Windows, `sc.exe create` or a Scheduled Task that starts `supercharge-studio-server-windows-x64.exe run` at boot is the match. Put `SCS_RELAY`, `SCS_SPAWN_AGENT=1`, and `SUPERCHARGE_AGENT_SECRET` in the task environment. The task's account needs `supercharge` on its `PATH`.
+
+## What lives in the data directory
+
+`SCS_DATA` holds the host id, the relay token, the control token, and the paired device keys. Copy that directory if you move the service to a new user and you want the phones to stay paired. The new process must be the only one connected to the relay with that host id.
+
+The agent secret is not in that file. It is the `SUPERCHARGE_AGENT_SECRET` you set. Losing it is fine if you also stop the old agent. The next start creates a new agent with the new secret. Phones stay paired, because pairing is the gateway key, not the agent secret.
+
+Provider config and sessions stay in `~/.supercharge/` for whichever user runs the agent. The systemd unit above runs the agent as `supercharge`, so that user's home is `/var/lib/supercharge-studio-server` and the CLI config is `/var/lib/supercharge-studio-server/.supercharge/config.toml`. Run `/setup` once as that user, or copy a config you already trust into that path and `chown` it to `supercharge`. A config that exists only in `/root/.supercharge` is invisible to the service.
