@@ -141,6 +141,11 @@ const steps = [
 
 const modes = ['Agent', 'Plan', 'Ask', 'your agent', 'Always-Approve', 'Auto-Review'];
 
+const recognitions = [
+  { name: 'Sentry', logo: '/badges/sentry.svg', note: 'Startup program' },
+  { name: 'PostHog', logo: '/badges/posthog.svg', note: 'Startup program' },
+];
+
 function SessionPanel() {
   const [index, setIndex] = useState(0);
   useEffect(() => {
@@ -237,6 +242,26 @@ export default function HomePage() {
             <p className="mt-2 max-w-sm text-sm leading-6 text-zinc-500">{step.body}</p>
           </Link>
         ))}
+      </section>
+
+      <section className="border-t border-white/10 px-6 py-10 md:px-10 lg:px-16">
+        <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-zinc-500">Built with</p>
+          <div className="flex flex-wrap items-center gap-3">
+            {recognitions.map((item) => (
+              <span key={item.name} className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2">
+                <img src={item.logo} alt={`${item.name} logo`} className="h-4 w-4" />
+                <span className="text-sm font-medium text-zinc-200">{item.name}</span>
+                <span className="text-xs text-zinc-500">{item.note}</span>
+              </span>
+            ))}
+            <img
+              src="/e2b/startup_badge-nameplate-outline-white.svg"
+              alt="E2B Startup Program"
+              className="h-8 w-auto"
+            />
+          </div>
+        </div>
       </section>
 
       <section className="grid items-center gap-8 px-6 py-16 md:px-10 lg:grid-cols-[1.4fr_0.8fr] lg:px-16">
