@@ -40,6 +40,7 @@ Type `/` in the prompt. The menu fuzzy-matches. A skill with `user-invocable: tr
 | `/auto` | Toggle Auto-Review. A classifier approves tools it treats as safe. |
 | `/plan [text]` | Plan mode. |
 | `/new_agent`, `/new-agent` | Create a custom agent in this chat. Paste a full prompt, or let the chat draft it. See [Custom agents](/docs/agents). |
+| `/lean` | Switch this chat to the built-in Lean 4 agent (Leancharge). `--lean` on launch does the same. See [Custom agents](/docs/agents#built-in-lean-agent). |
 | `/view-plan`, `/show-plan`, `/plan-view` | Preview the saved plan. |
 | `/multiline`, `/ml` | Enter inserts a newline. Shift+Enter or Alt+Enter sends. |
 | `/compact-mode` | Tighter layout. |
@@ -75,6 +76,7 @@ Project workflows: `.supercharge/workflows/*.rhai`. User workflows: `~/.supercha
 | Command | What it does |
 | --- | --- |
 | `/doctor` | Terminal, clipboard, color, input, notification checks. `/doctor fix` lists automatic fixes. Aliases `/terminal-setup`, `/terminal-check`, `/terminal-info`. |
+| `/codecov [fix] [scope]` | Local code-quality checks. Runs the project's own coverage tool plus a duplicate-code scan and prints a deterministic report. `fix` re-scans and queues an agent turn for the exact listed gaps. Nothing is uploaded and no tool is installed. |
 | `/tutorial`, `/tour`, `/onboarding` | Short onboarding topics. |
 | `/docs`, `/howto`, `/guides` | Built-in how-to picker. `/docs <title>` opens one guide. |
 | `/release-notes`, `/changelog` | Notes for this version. |

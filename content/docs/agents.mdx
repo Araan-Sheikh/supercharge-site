@@ -96,6 +96,59 @@ Selecting a custom agent keeps the coding tool loop (the same prompt mode as Age
 
 The displayed custom name is for this process. After you quit and resume, the session comes back as Agent, Plan, or Ask. Open Shift+Tab again to reselect the custom agent. The markdown file is still on disk.
 
+## Built-in Lean agent
+
+Supercharge ships one built-in alternate agent besides Plan and Ask: **Lean** (Leancharge). It is a coding agent specialized for [Lean 4](https://lean-lang.org/) — the programming language and proof assistant where mathematics is written as code and every theorem is checked by the compiler. A proof either compiles or it does not, so "done" in Lean is machine-verified, not claimed.
+
+The agent's system prompt is ported 1:1 from the upstream `lean.md` agent definition (kept verbatim so behavior matches the reference; see `NOTICE-UPSTREAM.md` in the CLI source for attribution). It replaces the normal system prompt entirely rather than layering on top of it.
+
+### What it is for
+
+- **Proof assistance and theorem proving** — writing and repairing Lean 4 proofs with tactics such as `grind` (preferred on Lean >= 4.22.0).
+- **Lean codebase work** — analyzing, editing, and building projects that use Lean 4 and the [mathlib4](https://github.com/leanprover-community/mathlib4) library.
+- **General coding tasks** in the same oriented style, with Lean-specific guardrails (see below).
+
+### How it works
+
+The agent runs a strict three-phase loop:
+
+1. **Orient** — restates your goal in one line, classifies the task as *investigate* (read-only: explain, audit, review, diagnose) or *change* (edit code), and explores before touching anything. On complex tasks it proposes a plan and waits for your confirmation before reading files.
+2. **Plan** (change tasks only) — lists the files to change and the specific change per file; multi-file changes become a numbered checklist.
+3. **Execute & verify** (change tasks only) — edits one logical unit at a time and verifies each one by running tests or reading the file back. It never claims completion without verification.
+
+### Lean-specific rules it follows
+
+- Creates projects with mathlib as a dependency via `lake +leanprover-community/mathlib4:lean-toolchain new <name> math`, or plain `lake init` otherwise.
+- Runs `lake exe cache get` after adding dependencies and before building — never builds an uncached dependency tree.
+- Checks correctness with `lake build` (whole repo) or `lake build <file>` (one file).
+- Prefers the `grind` tactic on Lean 4.22.0+.
+- Uses lean-lsp-mcp for interactive checking, but only after a successful `lake build`, and always re-reads files instead of trusting the LSP view.
+- Avoids `native_decide`.
+
+### Hard rules
+
+- Never stages, commits, or pushes proactively — saving files is the default; you commit.
+- Respects constraints like "no writes", "just analyze", or "plan only" as hard stops.
+- Changes only what was asked; does not rewrite or restructure unrelated code.
+- Stops and changes strategy after two failed attempts on the same region instead of flip-flopping.
+- Answers are structured first (code, ASCII trees, tables, `file:line` references) and brief — no filler.
+
+### Start it
+
+At launch:
+
+```bash
+supercharge --lean
+```
+
+Or switch the current chat:
+
+```
+/lean
+```
+
+`--lean` applies to the whole process. Lean is not a custom agent file: `/agents` does not list it and it does not join the Shift+Tab ring. To go back to the standard agent, quit and start a new session without `--lean`.
+
 ## Studio
 
 Studio's chat menu sends the same fields to the CLI over ACP (`supercharge/agents/create` and `supercharge/agents/list`). The CLI writes the markdown. The next `session/set_mode` loads that file. Editing the file by hand and editing it in Studio are the same store.
