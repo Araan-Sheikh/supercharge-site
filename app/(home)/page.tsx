@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { StudioHero } from '@/components/studio-hero';
 import { useEffect, useRef, useState } from 'react';
 import { capabilities, startupPrograms } from '@/components/home-content';
 import { DownloadOptions } from '@/components/download-options';
 import { androidUniversal, serverDownloads, studioLatestDownload } from '@/lib/studio-downloads';
-import { ArrowRight, ArrowUpRight, Download, Play, Plus } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Download, Plus } from 'lucide-react';
 import { InstallCommand } from '@/components/install-command';
 
 const features = [
@@ -33,7 +34,6 @@ const questions = [
 ];
 
 export default function HomePage() {
-  const [surface, setSurface] = useState<'desktop' | 'terminal' | 'mobile'>('desktop');
 
   const root = useRef<HTMLDivElement>(null);
   const [capability, setCapability] = useState(0);
@@ -47,28 +47,7 @@ export default function HomePage() {
     return () => observer.disconnect();
   }, []);
   return <div className="studio-landing" ref={root}>
-    <section className="studio-hero wrap" id="workspace">
-      <div className="hero-edition"><Link className="studio-release" href="/download">Supercharge Studio <span>v1.0.9</span><ArrowUpRight size={13}/></Link><span>macOS / Windows / Linux</span></div>
-      <div className="hero-composition">
-        <div className="hero-message"><h1>Bring your model.<br/>Open your project.</h1></div>
-        <div className="hero-description"><p className="studio-lead">A desktop home for your coding agent—with your repository, terminal, and browser in the same window.</p>
-          <div className="studio-actions"><Link href="/download" className="button">Get Studio <Download size={16}/></Link><a href="#walkthrough" className="hero-watch"><Play size={13}/> Watch it work</a></div>
-          <p className="studio-platforms">Free to use. Your model provider bills for usage.</p>
-          <Link href="/docs/install" className="hero-cli">Prefer the terminal? Install the CLI <ArrowUpRight size={12}/></Link>
-        </div>
-      </div>
-
-      <div className="product-stage"><div className="studio-showcase">
-        <div className="studio-surface-tabs" role="group" aria-label="Explore Supercharge">
-          {(['desktop', 'terminal', 'mobile'] as const).map(item => <button key={item} type="button" aria-pressed={surface===item} onClick={()=>setSurface(item)}>{item === 'desktop' ? 'Desktop' : item === 'terminal' ? 'Terminal' : 'Android'}</button>)}
-          <span>{surface === 'desktop' ? 'Projects, conversations, and tools in one app.' : surface === 'terminal' ? 'Work directly from your repository.' : 'Connect to the agent on your computer.'}</span>
-        </div>
-        {surface === 'desktop' && <div className="studio-real-preview"><img src="/studio-desktop.png" width="1920" height="1044" fetchPriority="high" alt="Supercharge Studio showing project navigation, an agent conversation, and its browser panel"/></div>}
-        {surface === 'terminal' && <div className="studio-terminal"><div><span>Supercharge CLI</span><Link href="/docs/commands">Command reference ↗</Link></div><pre><span>$ </span>supercharge{'\n\n'}<span>/setup</span>      Connect a model provider{'\n'}<span>/resume</span>     Continue a conversation{'\n'}<span>/new_agent</span>  Create a custom agent</pre><InstallCommand/></div>}
-        {surface === 'mobile' && <div className="studio-mobile"><div><h2>Continue from your phone.</h2><p>Pair the Android app with Studio. Your computer runs the agent while you follow the conversation.</p><Link href="/download#mobile" className="button button-secondary">Get the Android app <ArrowUpRight size={16}/></Link></div><img src="/studio-phone-chat.png" alt="Supercharge Studio chat on Android" width="420" height="850"/></div>}
-      </div>
-      </div><div className="studio-image-note"><span>{surface === 'terminal' ? 'Supercharge CLI commands' : 'Supercharge Studio · Desktop & Android'}</span><a href="#walkthrough">Watch the CLI walkthrough <Play size={11}/></a></div>
-    </section>
+    <StudioHero/>
 
     <section className="programs wrap" aria-labelledby="startup-programs">
       <div className="program-heading"><h2 id="startup-programs">Startup programs supporting Supercharge</h2><Link href="/donate">Support the project <ArrowUpRight size={13}/></Link></div>
