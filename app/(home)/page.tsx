@@ -141,9 +141,20 @@ const steps = [
 
 const modes = ['Agent', 'Plan', 'Ask', 'your agent', 'Always-Approve', 'Auto-Review'];
 
-const recognitions = [
-  { name: 'Sentry', logo: '/badges/sentry.svg', note: 'Startup program' },
-  { name: 'PostHog', logo: '/badges/posthog.svg', note: 'Startup program' },
+const startupPrograms: {
+  name: string;
+  logo: string;
+  note: string;
+  href: string;
+  wordmark?: boolean;
+}[] = [
+  { name: 'Sentry', logo: '/badges/sentry.svg', note: 'Startup program', href: 'https://sentry.io/for/startups/' },
+  { name: 'PostHog', logo: '/badges/posthog-logo-white.svg', note: 'Startup program', href: 'https://posthog.com/startups', wordmark: true },
+  { name: 'Free.ai', logo: '/badges/free-ai.svg', note: 'Startup program', href: 'https://free.ai/startup/' },
+  { name: 'Amplitude', logo: '/badges/amplitude.svg', note: 'Startup plan', href: 'https://amplitude.com/startups' },
+  { name: 'Clerk', logo: '/badges/clerk.svg', note: 'Startup discount', href: 'https://clerk.com/startups' },
+  { name: 'OpenScale', logo: '/badges/openscale.svg', note: 'Startup program', href: 'https://openscale.so/' },
+  { name: 'Wiro', logo: '/badges/wiro.svg', note: 'Startup program', href: 'https://wiro.ai/startups' },
 ];
 
 function SessionPanel() {
@@ -244,22 +255,38 @@ export default function HomePage() {
         ))}
       </section>
 
-      <section className="border-t border-white/10 px-6 py-10 md:px-10 lg:px-16">
+      <section className="border-t border-white/10 px-6 py-10 md:px-10 lg:px-16" aria-labelledby="startup-programs">
         <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-zinc-500">Built with</p>
+          <h2 id="startup-programs" className="font-mono text-xs uppercase tracking-[0.18em] text-zinc-500">Startup programs</h2>
           <div className="flex flex-wrap items-center gap-4">
-            {recognitions.map((item) => (
-              <span key={item.name} className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] px-6 py-3">
-                <img src={item.logo} alt={`${item.name} logo`} className="h-7 w-7" />
-                <span className="text-lg font-medium text-zinc-100">{item.name}</span>
+            {startupPrograms.map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                rel="noopener noreferrer"
+                aria-label={`${item.name} ${item.note}`}
+                className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] px-6 py-3 transition hover:border-white/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
+              >
+                <img
+                  src={item.logo}
+                  alt=""
+                  className={item.wordmark ? 'h-7 w-auto' : 'h-7 w-7'}
+                />
+                {!item.wordmark && <span className="text-lg font-medium text-zinc-100">{item.name}</span>}
                 <span className="text-sm text-zinc-500">{item.note}</span>
-              </span>
+              </a>
             ))}
-            <img
-              src="/e2b/startup_badge-nameplate-outline-white.svg"
-              alt="E2B Startup Program"
-              className="h-14 w-auto"
-            />
+            <a
+              href="https://e2b.dev/startups"
+              rel="noopener noreferrer"
+              className="rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
+            >
+              <img
+                src="/e2b/startup_badge-nameplate-outline-white.svg"
+                alt="E2B Startup Program"
+                className="h-14 w-auto"
+              />
+            </a>
           </div>
         </div>
       </section>
