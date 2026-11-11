@@ -49,7 +49,6 @@ export function ExplodedStudio({ onExpand }: { onExpand: () => void }) {
   };
 
   return <div ref={root} className="exploded-studio" data-paused={paused || reduced} style={{ '--spread': 1 } as React.CSSProperties}>
-    <div className="exploded-caption"><span><span className="studio-status-dot"/> SUPERCHARGE / STUDIO</span><span>Interactive illustration</span></div>
     <div ref={scene} className="exploded-scene" role="group" aria-label="3D Studio workspace. Use arrow keys to rotate; Escape resets the view." tabIndex={0}
       onPointerMove={event => {if(event.pointerType==='touch')return;const bounds=event.currentTarget.getBoundingClientRect();move(((event.clientY-bounds.top)/bounds.height-.5)*-10,((event.clientX-bounds.left)/bounds.width-.5)*12);}}
       onPointerDown={event=>{if(event.pointerType!=='touch')event.currentTarget.setPointerCapture(event.pointerId);}}
@@ -66,6 +65,5 @@ export function ExplodedStudio({ onExpand }: { onExpand: () => void }) {
       <div className="combined-workspace"><img src="/studio-desktop.png" width="1920" height="1044" alt="Actual Supercharge Studio desktop interface"/><span>One workspace. Your model.</span></div>
     </div>
     <div className="exploded-controls"><div className="exploded-controls-main"><button type="button" aria-pressed={combined} onClick={()=>setAssembled(root.current?.dataset.combined==='true'?false:true)}><Layers3 size={14}/> {combined?'Explore layers':'Bring it together'}</button><button type="button" className="exploded-reset" onClick={()=>{setAssembled(null);move(0,0);}} aria-label="Reset view and follow scrolling"><RotateCcw size={13}/></button></div><button type="button" aria-pressed={paused} onClick={()=>setPaused(!paused)} disabled={reduced} aria-label={paused?'Enable motion':'Pause motion'}>{paused||reduced?<Play size={13}/>:<Pause size={13}/>}</button><button type="button" className="actual-preview-link" onClick={onExpand}>Actual app <ArrowUpRight size={13}/></button></div>
-    <p className="exploded-hint">Explore the layers · Scroll to bring them together</p>
   </div>;
 }

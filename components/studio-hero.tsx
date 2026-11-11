@@ -15,7 +15,6 @@ export function StudioHero() {
   return <section className="sc-hero" id="workspace" aria-labelledby="sc-title">
     <div className="sc-hero-grid">
       <div className="sc-intro">
-        <p className="sc-edition">STUDIO / 01 <span>v1.0.9</span></p>
         <h1 id="sc-title">Start with<br/>your code.</h1>
         <p className="sc-description">Your agent, terminal, and browser.<br/>In one place.</p>
         <div className="sc-actions"><Link href="/download" className="sc-download">Download Studio <ArrowUpRight size={20}/></Link><Link href="/docs/install" className="sc-cli">Install the CLI <ArrowUpRight size={13}/></Link></div>
