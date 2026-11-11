@@ -1,14 +1,15 @@
 import type { Metadata, Viewport } from 'next';
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import './global.css';
+import './editorial.css';
 import { Inter } from 'next/font/google';
 
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://superchargeai.in'),
-  title: 'Supercharge — CLI docs',
+  title: 'Supercharge — Your code. Your models. Your workspace.',
   description:
-    'Docs for the Supercharge CLI: a free Rust coding agent. Bring your own model key, then run the terminal, the ACP server, or the inbox daemon.',
+    'An AI coding agent for your terminal and desktop. Bring your own model, work with your local repo, and make Supercharge your own.',
 };
 
 export const viewport: Viewport = {

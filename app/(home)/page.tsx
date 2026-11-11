@@ -1,415 +1,101 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Download, Smartphone } from 'lucide-react';
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
-import { androidUniversal, desktopDownloads, serverDownloads, studioLatestDownload, studioRelease } from '@/lib/studio-downloads';
+import { useEffect, useRef, useState } from 'react';
+import { capabilities, startupPrograms } from '@/components/home-content';
+import { DownloadOptions } from '@/components/download-options';
+import { androidUniversal, serverDownloads, studioLatestDownload } from '@/lib/studio-downloads';
+import { ArrowRight, ArrowUpRight, Download, Play, Plus } from 'lucide-react';
+import { InstallCommand } from '@/components/install-command';
 
-// Intersection observer hook for scroll animations
-const scrollObservers = new WeakMap<object, IntersectionObserver>();
-
-function Reveal({ className, children }: { className: string; children: ReactNode }) {
-  const [isVisible, setIsVisible] = useState(false);
-  const [key] = useState(() => ({}));
-  const setNode = useCallback((node: HTMLDivElement | null) => {
-    scrollObservers.get(key)?.disconnect();
-    if (!node) {
-      scrollObservers.delete(key);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true);
-      },
-      { threshold: 0.1, rootMargin: '50px' }
-    );
-    observer.observe(node);
-    scrollObservers.set(key, observer);
-  }, [key]);
-
-  return (
-    <div ref={setNode} className={`${className} transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-      {children}
-    </div>
-  );
-}
-
-const UNIX_INSTALL = 'curl -fsSL https://www.superchargeai.in/install.sh | bash';
-const WINDOWS_INSTALL = 'irm https://www.superchargeai.in/install.ps1 | iex';
-
-function InstallCommands() {
-  const [os, setOs] = useState<'unix' | 'windows'>('unix');
-  const [ready, setReady] = useState(false);
-  const [copied, setCopied] = useState<'unix' | 'windows' | null>(null);
-
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      const ua = navigator.userAgent || '';
-      const platform = navigator.platform || '';
-      setOs(/Win/i.test(platform) || /Windows/i.test(ua) ? 'windows' : 'unix');
-      setReady(true);
-    });
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  async function copy(kind: 'unix' | 'windows') {
-    const text = kind === 'windows' ? WINDOWS_INSTALL : UNIX_INSTALL;
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(kind);
-      window.setTimeout(() => setCopied(null), 1600);
-    } catch {
-      setCopied(null);
-    }
-  }
-
-  const cards = [
-    {
-      kind: 'unix' as const,
-      label: 'macOS and Linux',
-      command: UNIX_INSTALL,
-    },
-    {
-      kind: 'windows' as const,
-      label: 'Windows PowerShell',
-      command: WINDOWS_INSTALL,
-    },
-  ].sort((a, b) => (a.kind === os ? -1 : b.kind === os ? 1 : 0));
-
-  const active = cards[0];
-  return (
-    <div className="mt-6 flex w-full min-w-0 max-w-3xl flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-3 md:mt-8 md:flex-row md:items-center md:rounded-full md:p-0 md:py-2 md:pl-4 md:pr-2">
-      <div className="flex min-w-0 flex-1 items-center gap-2">
-        <button
-          type="button"
-          onClick={() => setOs(os === 'windows' ? 'unix' : 'windows')}
-          className="inline-flex h-11 shrink-0 items-center rounded-full px-3 font-mono text-xs text-zinc-400 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
-          aria-label={os === 'windows' ? 'Switch to the bash install command' : 'Switch to the PowerShell install command'}
-        >
-          {ready ? (os === 'windows' ? 'ps1' : 'bash') : '…'}
-        </button>
-        <div className="min-w-0 flex-1 overflow-x-auto overscroll-x-contain no-scrollbar">
-          <code className="block w-max max-w-none whitespace-nowrap font-mono text-sm text-orange-100">{active.command}</code>
-        </div>
-      </div>
-      <button
-        type="button"
-        onClick={() => copy(active.kind)}
-        className="inline-flex h-11 w-full shrink-0 items-center justify-center rounded-full bg-orange-500 px-4 text-sm font-semibold text-black md:w-auto md:px-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
-      >
-        {copied === active.kind ? 'Copied' : 'Copy'}
-      </button>
-    </div>
-  );
-}
-
-const capabilities = [
-  { title: 'Terminal', command: 'supercharge', detail: 'Interactive session in the repo you open. The agent reads files, runs tools, and edits code.', href: '/docs/commands' },
-  { title: 'Fully BYOK', command: '/setup', detail: 'You bring the key and the base URL. Supercharge does not sell a subscription or a credit balance. Switch the format later with /format.', href: '/docs/setup' },
-  { title: 'Three API formats', command: 'chat · messages · responses', detail: 'Chat Completions, Anthropic Messages, and OpenAI Responses. The CLI adds the path from the format you pick.', href: '/docs/setup' },
-  { title: 'ACP server', command: 'supercharge agent serve', detail: 'Agent Client Protocol on 127.0.0.1:2419. Editors reconnect with the same secret.', href: '/docs/modes' },
-  { title: 'Inbox daemon', command: 'supercharge agent daemon', detail: 'HTTP inbox on port 8790 when the companion server is installed. Thin clients never launch the CLI.', href: '/docs/modes' },
-  { title: 'One-shot runs', command: 'supercharge -p "…"', detail: 'A prompt, then exit. JSON output, tool allow lists, and --yolo for unattended runs.', href: '/docs/commands' },
-  { title: 'Custom agents', command: '/new_agent', detail: 'Write your own chat agent. Shift+Tab cycles Agent, Plan, Ask, those agents, Always-Approve, and Auto-Review.', href: '/docs/agents' },
-  { title: 'Sessions', command: '/resume', detail: 'Continue, rewind, compact, copy, and export conversations under ~/.supercharge/sessions.', href: '/docs/sessions' },
-  { title: 'Permissions', command: '/always-approve', detail: 'Ask, Auto-Review, or Always-Approve. --allow and --deny still gate shell and file tools.', href: '/docs/permissions' },
-  { title: 'Memory', command: '/remember', detail: 'Curated USER.md and MEMORY.md notes. Experimental /flush stays off unless you turn it on.', href: '/docs/memory' },
-  { title: 'Extensions', command: '/mcps', detail: 'MCP servers, skills, plugins, and hooks. Project rules live in AGENTS.md.', href: '/docs/extensions' },
+const features = [
+  {
+    title: 'Work in your repository',
+    body: 'The agent reads files, edits code, and runs commands on your computer. Use Agent to make changes, Plan to think them through, or Ask to understand the code.',
+    link: '/docs/agents', label: 'Agent modes',
+  },
+  {
+    title: 'Connect your model provider',
+    body: 'Use your own API key and endpoint. Supercharge supports Chat Completions, Anthropic Messages, and OpenAI Responses.',
+    link: '/docs/setup', label: 'Provider setup',
+  },
+  {
+    title: 'Choose what the agent can do',
+    body: 'Configure tool approvals and allow or deny rules. Add MCP servers, skills, and custom agents when your work needs them.',
+    link: '/docs/permissions', label: 'Permissions & control',
+  },
 ];
-
-function useTypewriter(text: string, speed = 55) {
-  const [displayText, setDisplayText] = useState('');
-  const [isComplete, setIsComplete] = useState(false);
-
-  useEffect(() => {
-    let i = 0;
-    setDisplayText('');
-    setIsComplete(false);
-    const timer = setInterval(() => {
-      if (i < text.length) {
-        setDisplayText(text.slice(0, i + 1));
-        i++;
-      } else {
-        setIsComplete(true);
-        clearInterval(timer);
-      }
-    }, speed);
-    return () => clearInterval(timer);
-  }, [text, speed]);
-
-  return { displayText, isComplete };
-}
-
-const steps = [
-  { n: "01", title: "Install", body: "One command. The binary lands in ~/.local/bin as supercharge.", href: "/docs/install" },
-  { n: "02", title: "Connect a model", body: "/setup takes a key, or a browser sign-in for Mistral, Nous, OpenCode Go, and OpenCode Zen.", href: "/docs/setup" },
-  { n: "03", title: "Work in the repo", body: "Shift+Tab walks Agent, Plan, Ask, the agents you wrote, Always-Approve, and Auto-Review.", href: "/docs/agents" },
+const questions = [
+  ['What does it cost?', 'Supercharge is free to use. There is no Supercharge subscription or credit balance. You bring your own model provider, whose usage charges may apply. Studio is closed source.'],
+  ['Do I need to install the CLI?', 'Yes. Install the CLI and run /setup to connect a provider first. Studio can then start the agent in the background or attach to an existing session.'],
+  ['Does my code stay on my computer?', 'The agent and its tools run on your computer. Model requests go to the endpoint you configure, so local execution does not mean that all data stays on your device.'],
+  ['How do I connect my phone?', 'Install Studio on your computer and the Android app on your phone. In Studio, open Settings → Devices → Show pairing code, scan the code on your phone, then approve the pairing on your computer.'],
 ];
-
-const modes = ['Agent', 'Plan', 'Ask', 'your agent', 'Always-Approve', 'Auto-Review'];
-
-const startupPrograms: {
-  name: string;
-  logo: string;
-  note: string;
-  href: string;
-  wordmark?: boolean;
-}[] = [
-  { name: 'Sentry', logo: '/badges/sentry.svg', note: 'Startup program', href: 'https://sentry.io/for/startups/' },
-  { name: 'PostHog', logo: '/badges/posthog-logo-white.svg', note: 'Startup program', href: 'https://posthog.com/startups', wordmark: true },
-  { name: 'Free.ai', logo: '/badges/free-ai.svg', note: 'Startup program', href: 'https://free.ai/startup/' },
-  { name: 'Amplitude', logo: '/badges/amplitude.svg', note: 'Startup plan', href: 'https://amplitude.com/startups' },
-  { name: 'Clerk', logo: '/badges/clerk.svg', note: 'Startup discount', href: 'https://clerk.com/startups' },
-  { name: 'OpenScale', logo: '/badges/openscale.svg', note: 'Startup program', href: 'https://openscale.so/' },
-  { name: 'Wiro', logo: '/badges/wiro.svg', note: 'Startup program', href: 'https://wiro.ai/startups' },
-];
-
-function SessionPanel() {
-  const [index, setIndex] = useState(0);
-  useEffect(() => {
-    const timer = setInterval(() => setIndex((value) => (value + 1) % modes.length), 1400);
-    return () => clearInterval(timer);
-  }, []);
-  return (
-    <div className="w-full min-w-0 max-w-full overflow-hidden rounded-3xl border border-white/10 bg-zinc-950 shadow-[0_40px_120px_-48px_rgba(249,115,22,0.7)]">
-      <div className="flex min-w-0 items-center gap-2 border-b border-white/10 px-3 py-3 sm:px-4">
-        <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-zinc-700" />
-        <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-zinc-700" />
-        <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-orange-500" />
-        <span className="ml-2 truncate font-mono text-xs text-zinc-500">supercharge</span>
-      </div>
-      <div className="min-w-0 space-y-3 px-3 py-4 font-mono text-xs sm:space-y-4 sm:px-5 sm:py-6 sm:text-sm">
-        <p className="break-words text-zinc-500">$ supercharge</p>
-        <p className="break-words text-zinc-300">/setup <span className="text-zinc-500">· key stays on this machine</span></p>
-        <p className="break-words">
-          <span className="text-zinc-500">Switched to mode: </span>
-          <span className="text-orange-300">{modes[index]}</span>
-        </p>
-        <div className="flex w-full min-w-0 flex-wrap gap-2 pt-1">
-          {modes.map((mode, modeIndex) => (
-            <span
-              key={mode}
-              className={`max-w-full shrink-0 rounded-full px-2.5 py-1.5 text-xs leading-tight transition-colors duration-500 ${modeIndex === index ? 'bg-orange-500 text-black' : 'bg-white/10 text-zinc-200'}`}
-            >
-              {mode}
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function HomePage() {
-  const { displayText, isComplete } = useTypewriter('runs on your machine.');
-  return (
-    <div className="flex w-full min-w-0 max-w-full flex-col bg-black text-zinc-100">
-      <style jsx global>{`
-        @keyframes rise {
-          from { opacity: 0; transform: translateY(18px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes drift {
-          0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-          50% { transform: translate3d(24px, -18px, 0) scale(1.06); }
-        }
-        @keyframes caret {
-          50% { opacity: 0; }
-        }
-        .rise { animation: rise 0.7s ease both; }
-        .drift { animation: drift 14s ease-in-out infinite; }
-        .caret { animation: caret 1s steps(1) infinite; }
-      `}</style>
-      <header className="relative w-full min-w-0 max-w-full px-4 pb-10 pt-10 md:px-10 md:pb-16 md:pt-14 lg:px-16 lg:pb-24 lg:pt-20">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-          <div className="absolute left-[-8%] top-[-10%] h-[28rem] w-[28rem] rounded-full bg-orange-600/20 blur-3xl drift" />
-        </div>
-        <div className="relative grid min-w-0 max-w-full items-center gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12">
-          <div className="min-w-0 max-w-full">
-            <p className="rise font-mono text-xs uppercase tracking-[0.22em] text-orange-400">CLI 1.4.5 · no subscription</p>
-            <h1 className="rise mt-4 text-balance break-words text-3xl font-semibold leading-snug tracking-tight text-white sm:mt-5 sm:text-5xl sm:leading-tight md:text-7xl lg:text-8xl md:leading-[1.05]" style={{ animationDelay: '0.08s' }}>
-              A coding agent that
-              <span className="mt-2 block break-words text-orange-500">
-                {displayText}
-                {!isComplete && <span className="caret">|</span>}
-              </span>
-            </h1>
-            <p className="rise mt-4 max-w-xl text-pretty break-words text-base leading-7 text-zinc-300 sm:mt-6 sm:text-lg sm:leading-8 sm:text-zinc-400" style={{ animationDelay: '0.16s' }}>
-              It reads the repo, edits files, and runs commands. The model key stays in <span className="font-mono text-zinc-200">/setup</span>.
-            </p>
-            <div className="rise min-w-0 max-w-full" style={{ animationDelay: '0.22s' }}>
-              <InstallCommands />
-            </div>
-            <div className="rise mt-4 flex w-full min-w-0 flex-col gap-2 sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center" style={{ animationDelay: '0.3s' }}>
-              <Link href="/docs" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-orange-500 px-5 text-sm font-semibold text-black sm:w-auto">
-                Read the docs <ArrowRight className="h-4 w-4" />
-              </Link>
-              <a href="#studio-downloads" className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-white/20 bg-white/[0.04] px-5 text-sm font-medium text-zinc-100 sm:w-auto">
-                Studio
-              </a>
-              <Link href="/donate" className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-white/20 bg-white/[0.04] px-5 text-sm font-medium text-zinc-100 sm:w-auto">
-                Donate
-              </Link>
-            </div>
-          </div>
-          <div className="rise min-w-0 max-w-full" style={{ animationDelay: '0.2s' }}>
-            <SessionPanel />
-          </div>
-        </div>
-      </header>
+  const [surface, setSurface] = useState<'desktop' | 'terminal' | 'mobile'>('desktop');
 
-      <section className="grid border-y border-white/10 md:grid-cols-3">
-        {steps.map((step, index) => (
-          <Link key={step.n} href={step.href} className="group px-4 py-6 md:px-10 md:py-8 lg:px-16" style={{ animationDelay: `${0.1 + index * 0.08}s` }}>
-            <p className="font-mono text-3xl text-white/15 transition group-hover:text-orange-500/80">{step.n}</p>
-            <h2 className="mt-4 text-lg font-medium text-white">{step.title}</h2>
-            <p className="mt-2 max-w-sm text-sm leading-6 text-zinc-500">{step.body}</p>
-          </Link>
-        ))}
-      </section>
+  const root = useRef<HTMLDivElement>(null);
+  const [capability, setCapability] = useState(0);
+  const [phone, setPhone] = useState(0);
+  useEffect(() => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('in-view'); observer.unobserve(entry.target); }
+    }), { threshold: 0.08 });
+    root.current?.querySelectorAll('section:not(:first-child)').forEach(section => { section.classList.add('reveal-section'); observer.observe(section); });
+    return () => observer.disconnect();
+  }, []);
+  return <div className="studio-landing" ref={root}>
+    <section className="studio-hero wrap" id="workspace">
+      <div className="hero-edition"><Link className="studio-release" href="/download">Supercharge Studio <span>v1.0.9</span><ArrowUpRight size={13}/></Link><span>macOS / Windows / Linux</span></div>
+      <div className="hero-composition">
+        <div className="hero-message"><h1>Bring your model.<br/>Open your project.</h1></div>
+        <div className="hero-description"><p className="studio-lead">A desktop home for your coding agent—with your repository, terminal, and browser in the same window.</p>
+          <div className="studio-actions"><Link href="/download" className="button">Get Studio <Download size={16}/></Link><a href="#walkthrough" className="hero-watch"><Play size={13}/> Watch it work</a></div>
+          <p className="studio-platforms">Free to use. Your model provider bills for usage.</p>
+          <Link href="/docs/install" className="hero-cli">Prefer the terminal? Install the CLI <ArrowUpRight size={12}/></Link>
+        </div>
+      </div>
 
-      <section className="border-t border-white/10 px-4 py-8 md:px-10 md:py-10 lg:px-16" aria-labelledby="startup-programs">
-        <div className="flex min-w-0 flex-col items-start gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
-          <h2 id="startup-programs" className="font-mono text-xs uppercase tracking-[0.18em] text-zinc-500">Startup programs</h2>
-          <div className="grid w-full min-w-0 grid-cols-2 gap-2 lg:flex lg:flex-wrap lg:items-center lg:gap-4">
-            {startupPrograms.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                rel="noopener noreferrer"
-                aria-label={`${item.name} ${item.note}`}
-                className="flex min-h-12 min-w-0 items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.06] px-3 py-2 transition hover:border-white/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 lg:w-auto lg:rounded-full lg:gap-3 lg:px-6 lg:py-3"
-              >
-                <img
-                  src={item.logo}
-                  alt=""
-                  className={item.wordmark ? 'h-5 w-auto max-w-[4.5rem] shrink-0 sm:max-w-[7rem] lg:h-7 lg:max-w-[7.5rem]' : 'h-5 w-5 shrink-0 lg:h-7 lg:w-7'}
-                />
-                <span className="min-w-0">
-                  {!item.wordmark && <span className="block truncate text-sm font-medium text-zinc-50 lg:text-lg">{item.name}</span>}
-                  <span className="block truncate text-xs text-zinc-300 lg:text-sm">{item.note}</span>
-                </span>
-              </a>
-            ))}
-            <a
-              href="https://e2b.dev/startups"
-              rel="noopener noreferrer"
-              className="col-span-2 inline-flex min-h-11 items-center justify-start rounded-sm lg:col-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
-            >
-              <img
-                src="/e2b/startup_badge-nameplate-outline-white.svg"
-                alt="E2B Startup Program"
-                className="h-12 w-auto max-w-full lg:h-14"
-              />
-            </a>
-          </div>
+      <div className="product-stage"><div className="studio-showcase">
+        <div className="studio-surface-tabs" role="group" aria-label="Explore Supercharge">
+          {(['desktop', 'terminal', 'mobile'] as const).map(item => <button key={item} type="button" aria-pressed={surface===item} onClick={()=>setSurface(item)}>{item === 'desktop' ? 'Desktop' : item === 'terminal' ? 'Terminal' : 'Android'}</button>)}
+          <span>{surface === 'desktop' ? 'Projects, conversations, and tools in one app.' : surface === 'terminal' ? 'Work directly from your repository.' : 'Connect to the agent on your computer.'}</span>
         </div>
-      </section>
+        {surface === 'desktop' && <div className="studio-real-preview"><img src="/studio-desktop.png" width="1920" height="1044" fetchPriority="high" alt="Supercharge Studio showing project navigation, an agent conversation, and its browser panel"/></div>}
+        {surface === 'terminal' && <div className="studio-terminal"><div><span>Supercharge CLI</span><Link href="/docs/commands">Command reference ↗</Link></div><pre><span>$ </span>supercharge{'\n\n'}<span>/setup</span>      Connect a model provider{'\n'}<span>/resume</span>     Continue a conversation{'\n'}<span>/new_agent</span>  Create a custom agent</pre><InstallCommand/></div>}
+        {surface === 'mobile' && <div className="studio-mobile"><div><h2>Continue from your phone.</h2><p>Pair the Android app with Studio. Your computer runs the agent while you follow the conversation.</p><Link href="/download#mobile" className="button button-secondary">Get the Android app <ArrowUpRight size={16}/></Link></div><img src="/studio-phone-chat.png" alt="Supercharge Studio chat on Android" width="420" height="850"/></div>}
+      </div>
+      </div><div className="studio-image-note"><span>{surface === 'terminal' ? 'Supercharge CLI commands' : 'Supercharge Studio · Desktop & Android'}</span><a href="#walkthrough">Watch the CLI walkthrough <Play size={11}/></a></div>
+    </section>
 
-      <section className="grid min-w-0 items-center gap-6 px-4 py-10 md:px-10 md:py-16 lg:grid-cols-[1.4fr_0.8fr] lg:px-16">
-        <video
-          className="w-full overflow-hidden rounded-3xl border border-white/10 bg-zinc-950"
-          src="/using-supercharge.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-          controls
-        />
-        <div>
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-orange-400">In the terminal</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">Shift+Tab is the whole control.</h2>
-          <p className="mt-4 text-zinc-400">Agent, Plan, and Ask change the work. Always-Approve and Auto-Review change whether a tool asks you first. <span className="text-zinc-200">/new_agent</span> adds one of your own to that ring.</p>
-        </div>
-      </section>
+    <section className="programs wrap" aria-labelledby="startup-programs">
+      <div className="program-heading"><h2 id="startup-programs">Startup programs supporting Supercharge</h2><Link href="/donate">Support the project <ArrowUpRight size={13}/></Link></div>
+      <div className="program-logos">{startupPrograms.map(item => <a href={item.href} key={item.name} aria-label={`${item.name} — ${item.note}`}><img src={item.logo} alt="" className={item.wordmark ? 'wordmark' : ''}/>{!item.wordmark && <strong>{item.name}</strong>}<small>{item.note}</small></a>)}<a href="https://e2b.dev/startups" aria-label="E2B Startup Program"><img className="e2b-badge" src="/e2b/startup_badge-nameplate-outline-white.svg" alt="E2B Startup Program"/></a></div>
+    </section>
+    <section className="studio-features wrap" aria-label="How Supercharge works">
+      {features.map(feature => <article key={feature.title}><h2>{feature.title}</h2><p>{feature.body}</p><Link href={feature.link}>{feature.label}<ArrowRight size={14}/></Link></article>)}
+    </section>
 
-      <section className="relative z-10 w-full min-w-0 border-t border-white/10 px-4 py-10 md:px-10 md:py-16 lg:px-16" aria-labelledby="studio-downloads">
-        <div className="w-full">
-          <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-orange-400">Studio · {studioRelease}</p>
-              <h2 id="studio-downloads" className="mt-2 text-3xl font-semibold tracking-tight text-white md:text-4xl">The app on top of the CLI.</h2>
-            </div>
-            <p className="max-w-md text-sm leading-6 text-zinc-500">Install the CLI first. The phone talks to the computer.</p>
-          </div>
-          <div className="mb-10 grid items-start gap-4">
-            <img
-              src="/studio-desktop.png"
-              alt="Supercharge Studio on the desktop, with a phone message in the chat and the browser panel open"
-              className="w-full rounded-2xl border border-zinc-800"
-            />
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <img src="/studio-phone-chat.png" alt="The same chat on the phone, connected to the computer" className="w-full rounded-2xl border border-zinc-800" />
-              <img src="/studio-phone-chats.png" alt="Phone chat history grouped by how recently each chat was used" className="w-full rounded-2xl border border-zinc-800" />
-              <img src="/studio-phone-projects.png" alt="Phone project list while connected on Wi-Fi" className="w-full rounded-2xl border border-zinc-800" />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {desktopDownloads.map((download) => (
-              <a
-                key={download.file}
-                href={`${studioLatestDownload}/${download.file}`}
-                className="group flex min-h-24 items-center justify-between gap-4 rounded-2xl border border-zinc-800 bg-zinc-950/80 px-5 py-4 transition hover:border-orange-500/50"
-              >
-                <span className="text-left">
-                  <span className="block font-medium text-zinc-100">{download.name}</span>
-                  <span className="mt-1 block text-sm text-zinc-500">{download.note}</span>
-                </span>
-                <Download className="h-5 w-5 shrink-0 text-orange-400 transition group-hover:translate-y-0.5" />
-              </a>
-            ))}
-          </div>
-          <a
-            href={`${studioLatestDownload}/${androidUniversal.file}`}
-            className="mt-3 flex min-h-24 items-center justify-between gap-4 rounded-2xl border border-zinc-800 bg-zinc-950/80 px-5 py-4 transition hover:border-orange-500/50"
-          >
-            <span className="flex items-center gap-3 text-left">
-              <Smartphone className="h-5 w-5 shrink-0 text-orange-400" />
-              <span>
-                <span className="block font-medium text-zinc-100">{androidUniversal.name}</span>
-                <span className="mt-1 block text-sm text-zinc-500">{androidUniversal.note}</span>
-              </span>
-            </span>
-            <Download className="h-5 w-5 shrink-0 text-orange-400" />
-          </a>
-          <h3 className="mb-3 mt-10 text-left text-xl font-semibold text-white">Server</h3>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {serverDownloads.map((download) => (
-              <a
-                key={download.file}
-                href={`${studioLatestDownload}/${download.file}`}
-                className="group flex min-h-24 items-center justify-between gap-4 rounded-2xl border border-zinc-800 bg-zinc-950/80 px-5 py-4 transition hover:border-orange-500/50"
-              >
-                <span className="text-left">
-                  <span className="block font-medium text-zinc-100">{download.name}</span>
-                  <span className="mt-1 block text-sm text-zinc-500">{download.note}</span>
-                </span>
-                <Download className="h-5 w-5 shrink-0 text-orange-400 transition group-hover:translate-y-0.5" />
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
+    <section className="studio-workflow wrap" id="walkthrough">
+      <div className="studio-section-copy"><span className="section-kicker">A LOOK INSIDE THE CLI</span><h2>See a session<br/>from start to finish.</h2><p>Use the CLI in your repo, open Studio for a desktop workspace, or connect your editor through ACP. It’s the same agent underneath.</p><Link href="/docs/modes" className="text-button">Explore ways to use Supercharge <ArrowRight size={15}/></Link></div>
+      <div className="studio-video"><video src="/using-supercharge.mp4" controls playsInline preload="metadata" aria-label="Supercharge CLI walkthrough"/><span>Supercharge CLI · Product walkthrough</span></div>
+    </section>
 
-      <Reveal className="w-full min-w-0 border-t border-white/10 px-4 py-10 md:px-10 md:py-16 lg:px-16">
-        <div className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
-          <h2 className="text-2xl font-semibold tracking-tight text-white md:text-3xl">Same binary, different doors.</h2>
-          <Link href="/docs/slash" className="inline-flex min-h-11 items-center gap-2 text-sm text-orange-300">
-            Slash commands <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-        <div className="divide-y divide-white/10 border-y border-white/10">
-          {capabilities.map((item) => (
-            <Link key={item.title} href={item.href} className="grid min-w-0 gap-1 py-4 transition-colors hover:bg-white/[0.03] md:grid-cols-[180px_220px_1fr] md:items-baseline md:gap-8 md:px-2 md:py-5">
-              <span className="font-medium text-white">{item.title}</span>
-              <span className="min-w-0 overflow-x-auto no-scrollbar font-mono text-sm text-orange-300">
-                <span className="block whitespace-nowrap">{item.command}</span>
-              </span>
-              <span className="text-sm leading-6 text-zinc-500">{item.detail}</span>
-            </Link>
-          ))}
-        </div>
-      </Reveal>
-    </div>
-  );
+    <section className="capability-section wrap" id="capabilities">
+      <div className="section-title"><h2>What’s in the CLI.</h2><Link href="/docs/slash">All commands <ArrowUpRight size={15}/></Link></div>
+      <div className="capability-explorer"><div className="capability-list" role="group" aria-label="Explore capabilities">{capabilities.map((item,i) => <button type="button" key={item.title} aria-pressed={capability===i} onClick={()=>setCapability(i)}><span>{item.title}</span><ArrowRight size={15}/></button>)}</div>
+      <div className="capability-detail" key={capability}><span className="detail-label">SUPERCHARGE CLI</span><code>{capabilities[capability].command}</code><h3>{capabilities[capability].title}</h3><p>{capabilities[capability].detail}</p><Link href={capabilities[capability].href}>Read the documentation <ArrowUpRight size={15}/></Link></div></div>
+    </section>
+    <section className="phone-section wrap" id="mobile-gallery">
+      <div className="studio-section-copy"><span className="section-kicker">STUDIO FOR ANDROID</span><h2>Check in<br/>from your phone.</h2><p>Pair your phone with Studio to follow conversations, revisit chats, and switch projects. The agent keeps running on your computer.</p><div className="phone-controls" role="group" aria-label="Android screenshots">{['Conversation','Chat history','Projects'].map((label,i)=><button key={label} aria-pressed={phone===i} onClick={()=>setPhone(i)}>{label}<ArrowRight size={14}/></button>)}</div><a className="text-button" href={`${studioLatestDownload}/${androidUniversal.file}`}>Download Android <Download size={15}/></a></div>
+      <div className="phone-stage"><img key={phone} src={['/studio-phone-chat.png','/studio-phone-chats.png','/studio-phone-projects.png'][phone]} alt={['Android agent conversation','Android chat history','Android project list'][phone]} loading="lazy"/></div>
+    </section>
+    <section className="home-setup wrap" id="studio-downloads"><div className="section-title"><h2>Set up Supercharge.</h2><Link href="/download">All downloads <ArrowUpRight size={15}/></Link></div><div className="setup-columns"><div className="setup-instructions"><h3>01. Install the CLI</h3><p>Start with the agent that powers Studio.</p><InstallCommand/><h3>Connect your model</h3><p>Run <code>/setup</code> to add your key or use a supported browser sign-in.</p><h3>Open your repository</h3><p>Launch Studio and choose a project. Use Agent, Plan, or Ask to start working.</p><Link className="text-button" href="/docs/setup">Setup guide <ArrowRight size={15}/></Link></div><DownloadOptions/></div><details className="server-downloads"><summary>Server downloads <Plus size={17}/></summary><div>{serverDownloads.map(item=><a href={`${studioLatestDownload}/${item.file}`} key={item.file}><span>{item.name}<small>{item.note}</small></span><Download size={16}/></a>)}</div></details></section>
+
+    <section className="studio-faq wrap"><h2>A few things to know.</h2><div>{questions.map(([question,answer])=><details key={question}><summary>{question}<Plus size={17}/></summary><p>{answer}</p></details>)}</div></section>
+
+
+  </div>;
 }

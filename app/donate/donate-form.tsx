@@ -18,6 +18,7 @@ export function DonateForm() {
               <button
                 key={value}
                 type="button"
+                aria-pressed={selected}
                 onClick={() => setAmount(String(value))}
                 className={`rounded-xl border px-2 py-2.5 text-sm font-medium transition-colors ${
                   selected
@@ -79,7 +80,7 @@ export function DonateForm() {
       </label>
       <button
         type="submit"
-        className="w-full rounded-full bg-orange-500 py-3 font-semibold text-black transition-colors hover:bg-orange-400"
+        className="w-full rounded-md bg-orange-500 py-3 font-semibold text-black transition-colors hover:bg-orange-400"
       >
         Continue to PayU
       </button>
