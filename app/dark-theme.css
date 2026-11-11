@@ -1,0 +1,67 @@
+/* The public site follows the same persisted theme as the documentation. */
+.site-theme-toggle {display:grid;place-items:center;flex-shrink:0;width:40px;height:40px;border:1px solid var(--line);border-radius:5px;background:transparent;color:var(--ink);}
+.site-theme-toggle:hover {background:var(--panel);}
+.theme-sun {display:none;}
+.dark .theme-sun {display:block;}
+.dark .theme-moon {display:none;}
+@media(max-width:800px){.site-theme-toggle{margin-left:auto;}.site .menu-toggle{margin-left:0;}.site .nav-download + .site-theme-toggle{margin-left:0;}}
+@media(max-width:560px){.site .site-theme-toggle{margin-left:auto;}}
+.dark .site {--surface:#101115;--panel:#191a21;--line:#30303a;--ink:#eeedf2;--muted:#aaa7b2;--accent:#c0a4ec;background:var(--surface);color:var(--ink);color-scheme:dark;}
+.dark .site .site-header {background:#101115ed;border-color:var(--line);}
+.dark .site .brand,.dark .site .mobile-nav a,.dark .site .menu-toggle {color:var(--ink);}
+.dark .site .brand-period {color:#bea3e7;}
+.dark .site .desktop-nav a {color:#b6b1bf;}
+.dark .site .desktop-nav a:hover {color:#fff;}
+.dark .site .mobile-nav {background:#16171d;}
+.dark .site .button:not(.button-secondary),.dark .sc-download {background:#e7def2;border-color:#e7def2;color:#211a2a;}
+.dark .site .button:not(.button-secondary):hover,.dark .sc-download:hover {background:#cdb6eb;border-color:#cdb6eb;}
+.dark .site .button-secondary {color:#d5cbdc;border-color:#4a4254;}
+.dark .site .button-secondary:hover {background:#26212e;}
+.dark .site .sc-description {color:#d0cad6;}
+.dark .site .sc-model-note,.dark .sc-cli {color:#b4a9bf;}
+.dark .site .sc-platform-note {color:#9990a4;}
+.dark .sc-switcher {border-color:#3b3444;}
+.dark .sc-switcher button {color:#a49aaa;}
+.dark .sc-switcher button:hover,.dark .sc-switcher button[aria-selected=true] {color:#eee3fa;}
+.dark .sc-switcher button::after {background:#c3a2ed;}
+.dark .exploded-controls {border-color:#39313f;}
+.dark .exploded-controls button {color:#c6b2d8;border-color:#50405f;}
+.dark .exploded-controls button:hover {background:#30223d;color:#efe0ff;}
+.dark .combined-workspace > span {color:#b09ebf;}
+.dark .exploded-floor {background:radial-gradient(ellipse,#a67add25,transparent 65%);border-color:#ac7cd724;}
+.dark .exploded-floor::after {border-color:#ac7cd724;}
+.dark .workspace-layer {border-color:#7d628e;box-shadow:0 2px 0 #493652,0 5px 0 #302637,0 22px 35px #0006;}
+.dark .site .program-heading h2,.dark .site .program-heading a {color:#a9a0b3;}
+.dark .site .program-logos strong {color:#e2dce8;}
+.dark .site .program-logos small {color:#9d92a6;}
+.dark .site .program-logos img[src$="sentry.svg"],.dark .site .program-logos img[src$="clerk.svg"],.dark .site .program-logos img[src$="amplitude.svg"],.dark .site .program-logos img.wordmark,.dark .site .program-logos img.e2b-badge {filter:none;opacity:1;}
+.dark .site .studio-features article h2 {color:#e1dce7;}
+.dark .site .studio-features article p,.dark .site .studio-section-copy p,.dark .site .studio-faq details p {color:#aca3b6;}
+.dark .site .studio-features article + article {border-color:var(--line);}
+.dark .site .studio-features article a,.dark .site .text-button,.dark .site .studio-section-copy .text-button,.dark .site .section-title > a {color:#cbb0e5;}
+.dark .site .studio-video video {border-color:#403348;}
+.dark .site .studio-video > span {color:#9f91ac;}
+.dark .site .capability-list button {color:#b0a4bd;}
+.dark .site .capability-list button:hover {background:#231c2b;color:#eee3f8;}
+.dark .site .capability-list button[aria-pressed=true] {background:#32263e;color:#e1c6f9;}
+.dark .site .capability-detail {background:#19161f;border-color:#372e40;}
+.dark .site .capability-detail code {color:#c5a0e8;}
+.dark .site .capability-detail p {color:#b4a6c1;}
+.dark .site .detail-label {color:#a798b3;}
+.dark .site .phone-stage {background:#1b1722;border-color:#39303f;}
+.dark .site .phone-controls button {color:#afa0bc;}
+.dark .site .phone-controls button[aria-pressed=true] {color:#d5b4f0;}
+.dark .site .install-box,.dark .site .install-top select {background:#1c1923;color:#bdaecb;border-color:#3c3047;}
+.dark .site .command-line code {color:#d1b7e8;}
+.dark .site .command-line button {background:#30243d;border-color:#544062;color:#dcc0f3;}
+.dark .site .download-row {border-color:var(--line);}
+.dark .site .os-selector button[aria-pressed=true] {background:#30243c;border-color:#574268;color:#d8b8f0;}
+.dark .site .download-row small,.dark .site .download-panel > p {color:#a89ab6;}
+.dark .site .site-footer {background:#0d0e12;border-color:#2d2635;}
+.dark .site .footer-grid p,.dark .site .footer-grid > div:not(:first-child) a {color:#afa3b9;}
+.dark .site .footer-grid h2 {color:#e0d4eb;}
+.dark .site .footer-note,.dark .site .footer-bottom {color:#9f92ac;}
+.dark .site .catalog-connect,.dark .site .support-card {background:#1a1720;border-color:#3b2e45;}
+.dark .site .plugin-card .command-line {background:#231d2c;}
+.dark .site .eyebrow {color:#baa0d0;}
+@media(max-width:560px){.site .site-nav .site-theme-toggle{margin-left:auto;}}

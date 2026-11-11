@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { ArrowUpRight, Menu, X } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { ArrowUpRight, Menu, X, Sun, Moon } from 'lucide-react';
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const { resolvedTheme, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
   const links = [{ href: '/#workspace', label: 'Product' }, { href: '/plugins', label: 'Plugins' }, { href: '/docs', label: 'Documentation' }];
   return <header className="site-header">
@@ -15,6 +17,7 @@ export function SiteHeader() {
       <Link href="/" className="brand" aria-label="Supercharge home"><img src="/logo.png" width="30" height="30" alt="" />supercharge<span className="brand-period">.</span></Link>
       <nav className="desktop-nav" aria-label="Main navigation">{links.map(l => <Link key={l.href} href={l.href} aria-current={pathname === l.href ? 'page' : undefined}>{l.label}</Link>)}</nav>
       <Link href="/download" className="button button-small nav-download">Download <ArrowUpRight size={15} /></Link>
+      <button type="button" className="site-theme-toggle" aria-label="Toggle color theme" title="Toggle light / dark theme" onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}><Sun className="theme-sun" size={18}/><Moon className="theme-moon" size={18}/></button>
       <button type="button" className="menu-toggle" aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(!open)}>{open ? <X size={22} /> : <Menu size={22} />}</button>
     </div>
     {open && <nav id="mobile-navigation" className="mobile-nav" aria-label="Mobile navigation">{[...links, { href: '/download', label: 'Get Supercharge' }].map(l => <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>{l.label}<ArrowUpRight size={16}/></Link>)}</nav>}

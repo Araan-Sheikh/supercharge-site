@@ -3,6 +3,7 @@ import { RootProvider } from 'fumadocs-ui/provider/next';
 import './global.css';
 import './editorial.css';
 import './studio-hero.css';
+import './dark-theme.css';
 import { Inter } from 'next/font/google';
 
 
@@ -29,7 +30,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={inter.className} suppressHydrationWarning>
       <body className="flex min-h-screen min-w-0 flex-col" suppressHydrationWarning>
-        <RootProvider>
+        <RootProvider theme={{ defaultTheme: 'dark', enableSystem: false }}>
           <main className="flex-1">{children}</main>
         </RootProvider>
       </body>
