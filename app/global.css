@@ -7,8 +7,32 @@ html {
   scroll-behavior: smooth;
 }
 
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+body,
+main {
+  min-width: 0;
+  width: 100%;
+}
+
 #nd-nav {
   --fd-layout-width: 100%;
+}
+
+/* Usable tap targets in the fumadocs home nav without changing desktop density much */
+#nd-nav a,
+#nd-nav button {
+  min-height: 44px;
+}
+
+@media (max-width: 767px) {
+  #nd-nav {
+    padding-inline: 0.75rem;
+  }
 }
 
 /* Performance optimization for animations */

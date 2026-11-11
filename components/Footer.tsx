@@ -38,7 +38,7 @@ const columns = [
 export function Footer() {
   return (
     <footer className="border-t border-zinc-800 bg-zinc-950 text-zinc-400">
-      <div className="grid w-full gap-10 px-6 py-12 sm:grid-cols-2 lg:grid-cols-4 lg:px-10">
+      <div className="grid w-full min-w-0 gap-8 px-4 py-8 sm:grid-cols-2 sm:px-6 md:gap-10 md:py-12 lg:grid-cols-4 lg:px-10">
         <div>
           <p className="flex items-center gap-2 text-base font-semibold text-white">
             <img src="/logo.png" alt="" width={28} height={28} className="h-7 w-7 rounded-md object-cover" />
@@ -50,7 +50,7 @@ export function Footer() {
           </p>
           <a
             href="https://github.com/iotserver24/supercharge-app"
-            className="mt-5 inline-flex items-center gap-2 text-sm text-zinc-300 hover:text-orange-400"
+            className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm text-zinc-300 hover:text-orange-400"
           >
             <Github className="h-4 w-4" />
             iotserver24/supercharge-app
@@ -59,15 +59,15 @@ export function Footer() {
         {columns.map((column) => (
           <div key={column.title}>
             <p className="text-sm font-semibold text-zinc-100">{column.title}</p>
-            <ul className="mt-3 space-y-2 text-sm">
+            <ul className="mt-2 text-sm">
               {column.links.map((link) => (
                 <li key={link.href}>
                   {link.href.startsWith('http') ? (
-                    <a href={link.href} className="hover:text-orange-400">
+                    <a href={link.href} className="inline-flex min-h-11 items-center hover:text-orange-400">
                       {link.label}
                     </a>
                   ) : (
-                    <Link href={link.href} className="hover:text-orange-400">
+                    <Link href={link.href} className="inline-flex min-h-11 items-center hover:text-orange-400">
                       {link.label}
                     </Link>
                   )}
@@ -78,7 +78,7 @@ export function Footer() {
         ))}
       </div>
       <div className="border-t border-zinc-800">
-        <div className="flex w-full flex-col gap-2 px-6 py-4 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between lg:px-10">
+        <div className="flex w-full min-w-0 flex-col gap-1 px-4 py-4 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-10">
           <p>© {new Date().getFullYear()} R3AP3R Editz</p>
           <p>superchargeai.in</p>
         </div>
