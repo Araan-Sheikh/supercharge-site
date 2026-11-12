@@ -76,3 +76,13 @@
 @media(prefers-reduced-motion:reduce){
   .site .studio-landing *,.site .studio-landing *::before,.site .studio-landing *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;}
 }
+
+/* The actual brand mark flies over the workspace; the existing pause control stops it. */
+.hero-flying-logo {position:absolute;right:10%;top:5%;width:64px;height:64px;z-index:4;pointer-events:none;animation:hero-logo-flight 5s ease-in-out infinite;filter:drop-shadow(0 8px 12px #0003);}
+.hero-flying-logo img {position:relative;display:block;width:100%;height:100%;object-fit:contain;}
+.hero-logo-trail {position:absolute;right:70%;top:57%;width:76px;height:18px;transform:rotate(-20deg);transform-origin:right center;background-image:radial-gradient(circle,var(--accent) 1px,transparent 1.5px);background-size:8px 6px;mask-image:linear-gradient(to right,transparent,#0009);animation:hero-trail 1s linear infinite;}
+@keyframes hero-logo-flight {0%,100%{transform:translate(-12px,8px) rotate(-8deg)}45%{transform:translate(14px,-12px) rotate(5deg)}70%{transform:translate(6px,-6px) rotate(0deg)}}
+@keyframes hero-trail {to{background-position:-16px 0}}
+.exploded-studio[data-paused=true] .hero-flying-logo,.exploded-studio[data-paused=true] .hero-logo-trail {animation-play-state:paused;}
+@media(max-width:680px){.hero-flying-logo{width:44px;height:44px;right:8%;top:0;animation:hero-logo-flight 4s ease-in-out 1;}.hero-logo-trail{width:48px;animation-iteration-count:4;}}
+@media(prefers-reduced-motion:reduce){.hero-flying-logo,.hero-logo-trail{animation:none!important;}.hero-logo-trail{display:none;}}
