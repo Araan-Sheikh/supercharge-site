@@ -26,5 +26,6 @@ export const startupPrograms: {
   { name: 'Clerk', logo: '/badges/clerk.svg', note: 'Startup discount', href: 'https://clerk.com/startups' },
   { name: 'OpenScale', logo: '/badges/openscale.svg', note: 'Startup program', href: 'https://openscale.so/' },
   { name: 'Wiro', logo: '/badges/wiro.svg', note: 'Startup program', href: 'https://wiro.ai/startups' },
+  { name: 'MongoDB', logo: '/badges/mongodb.png', note: 'Startup program', href: 'https://www.mongodb.com/startups', wordmark: true },
 ];
 
