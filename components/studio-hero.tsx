@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { useRef, useState } from 'react';
-import { ArrowUpRight, X } from 'lucide-react';
+import { ArrowUpRight, X, Monitor, Terminal, Smartphone, Play } from 'lucide-react';
 import { InstallCommand } from './install-command';
 import { ExplodedStudio } from './exploded-studio';
 
 const surfaces = ['Desktop', 'Terminal', 'Android'] as const;
+const surfaceIcons = [Monitor, Terminal, Smartphone];
 export function StudioHero() {
   const [active, setActive] = useState(0);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -16,10 +17,10 @@ export function StudioHero() {
     <div className="sc-hero-grid">
       <div className="sc-intro">
         <h1 id="sc-title">Start with<br/>your code.</h1>
-        <p className="sc-description">Your agent, terminal, and browser.<br/>In one place.</p>
+        <p className="sc-description">An AI coding workspace built around your repository. Your agent, terminal, and browser—in one place.</p>
         <div className="sc-actions"><Link href="/download" className="sc-download">Download Studio <ArrowUpRight size={20}/></Link><Link href="/docs/install" className="sc-cli">Install the CLI <ArrowUpRight size={13}/></Link></div>
-        <p className="sc-model-note">Bring your own model.</p>
-        <p className="sc-platform-note">macOS, Windows & Linux · Free to use<small>Your provider’s usage charges may apply.</small></p>
+        <a className="sc-model-note sc-watch" href="#walkthrough"><Play size={13}/> Watch a session <span>↗</span></a>
+        <p className="sc-platform-note">Free to use · Bring your own model<small>macOS, Windows & Linux</small><small>Your provider’s usage charges may apply.</small></p>
       </div>
       <div className={`sc-product ${active === 0 ? 'sc-product-3d' : ''}`}>
         <div className={`sc-panel ${active === 0 ? 'sc-panel-3d' : ''}`} id={`sc-panel-${active}`} role="tabpanel" aria-labelledby={`sc-tab-${active}`} tabIndex={0}>
@@ -29,7 +30,7 @@ export function StudioHero() {
         </div>
       </div>
     </div>
-    <div className="sc-switcher" role="tablist" aria-label="Explore Supercharge on your devices" onKeyDown={event=>{const keys=['ArrowRight','ArrowLeft','Home','End'];if(!keys.includes(event.key))return;event.preventDefault();choose(event.key==='Home'?0:event.key==='End'?2:(active+(event.key==='ArrowRight'?1:2))%3);}}>{surfaces.map((label,index)=><button type="button" key={label} ref={node=>{tabs.current[index]=node;}} id={`sc-tab-${index}`} role="tab" aria-selected={active===index} aria-controls={`sc-panel-${index}`} tabIndex={active===index?0:-1} onClick={()=>setActive(index)}>{label}</button>)}</div>
+    <div className="sc-switcher" role="tablist" aria-label="Explore Supercharge on your devices" onKeyDown={event=>{const keys=['ArrowRight','ArrowLeft','Home','End'];if(!keys.includes(event.key))return;event.preventDefault();choose(event.key==='Home'?0:event.key==='End'?2:(active+(event.key==='ArrowRight'?1:2))%3);}}>{surfaces.map((label,index)=><button type="button" key={label} ref={node=>{tabs.current[index]=node;}} id={`sc-tab-${index}`} role="tab" aria-selected={active===index} aria-controls={`sc-panel-${index}`} tabIndex={active===index?0:-1} onClick={()=>setActive(index)}>{(() => { const Icon = surfaceIcons[index]; return <Icon size={16} aria-hidden="true"/>; })()}{label}</button>)}</div>
     <dialog ref={dialog} className="sc-image-dialog" aria-label="Full Supercharge Studio screenshot" onClose={()=>tabs.current[active]?.focus()} onClick={event=>{if(event.target===event.currentTarget)dialog.current?.close();}}><div><button type="button" autoFocus onClick={()=>dialog.current?.close()} aria-label="Close screenshot"><X size={22}/></button><img src="/studio-desktop.png" width="1920" height="1044" alt="Full Supercharge Studio screenshot, including project sidebar, agent conversation and browser panel"/><p>Supercharge Studio · Actual interface</p></div></dialog>
   </section>;
 }

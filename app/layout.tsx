@@ -5,6 +5,7 @@ import './global.css';
 import './editorial.css';
 import './studio-hero.css';
 import './dark-theme.css';
+import './landing-polish.css';
 import { Inter } from 'next/font/google';
 
 

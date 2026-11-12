@@ -37,6 +37,12 @@ export default function HomePage() {
 
   const root = useRef<HTMLDivElement>(null);
   const [capability, setCapability] = useState(0);
+  const capabilityTabs = useRef<(HTMLButtonElement | null)[]>([]);
+  const chooseCapability = (index: number) => {
+    setCapability(index);
+    capabilityTabs.current[index]?.focus();
+    capabilityTabs.current[index]?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  };
   const [phone, setPhone] = useState(0);
   useEffect(() => {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -64,8 +70,12 @@ export default function HomePage() {
 
     <section className="capability-section wrap" id="capabilities">
       <div className="section-title"><h2>What’s in the CLI.</h2><Link href="/docs/slash">All commands <ArrowUpRight size={15}/></Link></div>
-      <div className="capability-explorer"><div className="capability-list" role="group" aria-label="Explore capabilities">{capabilities.map((item,i) => <button type="button" key={item.title} aria-pressed={capability===i} onClick={()=>setCapability(i)}><span>{item.title}</span><ArrowRight size={15}/></button>)}</div>
-      <div className="capability-detail" key={capability}><span className="detail-label">SUPERCHARGE CLI</span><code>{capabilities[capability].command}</code><h3>{capabilities[capability].title}</h3><p>{capabilities[capability].detail}</p><Link href={capabilities[capability].href}>Read the documentation <ArrowUpRight size={15}/></Link></div></div>
+      <div className="capability-explorer"><div className="capability-list" role="tablist" aria-label="Explore capabilities" onKeyDown={event => {
+        if (!['ArrowRight','ArrowLeft','ArrowDown','ArrowUp','Home','End'].includes(event.key)) return;
+        event.preventDefault();
+        chooseCapability(event.key === 'Home' ? 0 : event.key === 'End' ? capabilities.length - 1 : (capability + (['ArrowRight','ArrowDown'].includes(event.key) ? 1 : capabilities.length - 1)) % capabilities.length);
+      }}>{capabilities.map((item,i) => <button type="button" key={item.title} ref={node=>{capabilityTabs.current[i]=node;}} id={`capability-tab-${i}`} role="tab" aria-selected={capability===i} aria-controls="capability-panel" tabIndex={capability===i?0:-1} onClick={()=>setCapability(i)}><span>{item.title}</span><ArrowRight size={15}/></button>)}</div>
+      <div className="capability-detail" id="capability-panel" role="tabpanel" aria-labelledby={`capability-tab-${capability}`} tabIndex={0} key={capability}><span className="detail-label">{String(capability + 1).padStart(2,'0')} / {capabilities.length} capabilities</span><code>{capabilities[capability].command}</code><h3>{capabilities[capability].title}</h3><p>{capabilities[capability].detail}</p><Link href={capabilities[capability].href}>Read the documentation <ArrowUpRight size={15}/></Link></div></div>
     </section>
     <section className="phone-section wrap" id="mobile-gallery">
       <div className="studio-section-copy"><h2>Check in<br/>from your phone.</h2><p>Pair your phone with Studio to follow conversations, revisit chats, and switch projects. The agent keeps running on your computer.</p><div className="phone-controls" role="group" aria-label="Android screenshots">{['Conversation','Chat history','Projects'].map((label,i)=><button key={label} aria-pressed={phone===i} onClick={()=>setPhone(i)}>{label}<ArrowRight size={14}/></button>)}</div><a className="text-button" href={`${studioLatestDownload}/${androidUniversal.file}`}>Download Android <Download size={15}/></a></div>
