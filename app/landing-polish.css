@@ -1,6 +1,6 @@
 /* Shared landing rhythm and controls, using the active theme's color tokens. */
-.site .sc-hero {width:min(1320px,calc(100% - 112px));padding-top:38px;}
-.site .sc-hero-grid {grid-template-columns:44% 56%;min-height:570px;padding-bottom:10px;}
+.site .sc-hero {width:min(1180px,calc(100% - 112px));padding-top:38px;}
+.site .sc-hero-grid {grid-template-columns:44% 56%;min-height:570px;padding-bottom:32px;}
 .site .sc-intro {padding:0 32px 36px 0;}
 .site .sc-intro h1 {font-size:clamp(64px,7.3vw,104px);font-weight:550;letter-spacing:-.07em;line-height:1.02;margin-bottom:28px;text-wrap:balance;}
 .site .sc-description {max-width:370px;font-size:17px;line-height:1.7;color:var(--muted);letter-spacing:-.015em;}
@@ -17,8 +17,8 @@
 .site .sc-switcher button::after {display:none;}
 .site .sc-switcher button[aria-selected=true] {background:var(--surface);color:var(--ink);box-shadow:0 1px 4px #0002;}
 .site .sc-switcher button:hover {color:var(--ink);}
-.site .sc-panel-3d {height:550px;}
-.site .exploded-controls {border-top:0;gap:8px;}
+.site .sc-panel.sc-panel-3d {height:auto;min-height:0;}
+.site .exploded-controls {border-top:0;gap:8px;padding-top:20px;}
 .site .exploded-controls button {border-radius:5px;min-height:38px;}
 .site .studio-landing > .programs {padding-block:32px 46px;border-top:1px solid var(--line);}
 .site .program-heading h2,.site .program-heading a {font-size:12px;color:var(--muted);}
@@ -64,13 +64,16 @@
 .site :is(a,button,summary,[tabindex]):focus-visible {outline:2px solid var(--accent);outline-offset:4px;}
 .site .studio-landing :is(a,button) { -webkit-tap-highlight-color:transparent; }
 @media(max-width:1000px) {
-  .site .sc-hero {width:calc(100% - 64px);}
+  .site .sc-hero {width:calc(100% - 112px);}
   .site .sc-intro h1 {font-size:68px;}
   .site .sc-description {font-size:15px;}
   .site .sc-hero-grid {min-height:520px;}
   .site .capability-explorer {grid-template-columns:230px minmax(0,1fr);}
   .site .capability-detail {padding:32px;}
   .site .studio-workflow,.site .phone-section {gap:36px;}
+}
+@media(max-width:900px) and (min-width:681px) {
+  .site .sc-hero {width:calc(100% - 64px);}
 }
 @media(max-width:680px) {
   .site .sc-hero {width:calc(100% - 40px);padding-top:38px;}
@@ -83,7 +86,8 @@
   .site .sc-cli {font-size:12px;}
   .site .sc-watch {margin-top:8px;}
   .site .sc-platform-note {margin-top:4px;}
-  .site .sc-panel-3d {height:430px;}
+  .site .sc-panel.sc-panel-3d {height:auto;min-height:0;}
+  .site .exploded-controls {padding-top:8px;}
   .site .sc-switcher {margin-bottom:28px;}
   .site .sc-switcher button {padding:10px 17px;gap:7px;font-size:12px;}
   .site .program-heading {gap:16px;align-items:start;}
