@@ -46,12 +46,37 @@ export default function HomePage() {
   };
   const [phone, setPhone] = useState(0);
   useEffect(() => {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
-      if (entry.isIntersecting) { entry.target.classList.add('in-view'); observer.unobserve(entry.target); }
-    }), { threshold: 0.08 });
-    root.current?.querySelectorAll('section:not(:first-child)').forEach(section => { section.classList.add('reveal-section'); observer.observe(section); });
-    return () => observer.disconnect();
+    const preference = matchMedia('(prefers-reduced-motion: reduce)');
+    const animations = new Set<Animation>();
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        observer.unobserve(entry.target);
+        if (preference.matches) continue;
+        const children = Array.from(entry.target.children);
+        children.forEach((child, index) => {
+          const animation = child.animate([
+            { opacity: 0, transform: 'translateY(22px)' },
+            { opacity: 1, transform: 'translateY(0)' },
+          ], { duration: 650, delay: Math.min(index * 90, 270), easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' });
+          animations.add(animation);
+          animation.onfinish = () => animations.delete(animation);
+        });
+      }
+    }, { threshold: 0, rootMargin: '0px 0px -48px 0px' });
+    // Keep content visible before hydration and when navigating directly to a section.
+    root.current?.querySelectorAll(':scope > section:not(:first-child)').forEach(section => {
+      if (section.getBoundingClientRect().top > window.innerHeight) observer.observe(section);
+    });
+    const stopMotion = () => {
+      if (preference.matches) { animations.forEach(animation => animation.cancel()); animations.clear(); }
+    };
+    preference.addEventListener('change', stopMotion);
+    return () => {
+      observer.disconnect();
+      animations.forEach(animation => animation.cancel());
+      preference.removeEventListener('change', stopMotion);
+    };
   }, []);
   return <div className="studio-landing" ref={root}>
     <StudioHero/>

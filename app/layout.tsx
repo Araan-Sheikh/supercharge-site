@@ -7,6 +7,7 @@ import './studio-hero.css';
 import './dark-theme.css';
 import './landing-polish.css';
 import './dot-art.css';
+import './landing-motion.css';
 import { Inter } from 'next/font/google';
 
 
