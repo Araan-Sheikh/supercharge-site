@@ -1,5 +1,7 @@
 'use client';
 
+import { DotImage } from '@/components/dot-image';
+
 import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Layers3, MousePointer2, Pause, Play, RotateCcw, Terminal, FileCode2, Sparkles } from 'lucide-react';
 
@@ -62,7 +64,7 @@ export function ExplodedStudio({ onExpand }: { onExpand: () => void }) {
         <div className="workspace-layer layer-terminal"><div className="layer-top"><span><Terminal size={13}/> Terminal</span><span>03 / VERIFY</span></div><div className="terminal-example"><p><span>❯</span> npm test -- session</p><p className="test-line">✓ active session<br/>✓ expired session redirects<br/>✓ missing session</p><div><b>3 passed</b><span>Illustrative output</span></div></div></div>
         <div className="violet-cursor"><MousePointer2 size={20} fill="currentColor"/><span>supercharge</span></div>
       </div>
-      <div className="combined-workspace"><img src="/studio-desktop.png" width="1920" height="1044" alt="Actual Supercharge Studio desktop interface"/><span>One workspace. Your model.</span></div>
+      <div className="combined-workspace"><DotImage src="/studio-desktop.png" width={1920} height={1044} alt="Actual Supercharge Studio desktop interface"/><span>One workspace. Your model.</span></div>
     </div>
     <div className="exploded-controls"><div className="exploded-controls-main"><button type="button" aria-pressed={combined} onClick={()=>setAssembled(root.current?.dataset.combined==='true'?false:true)}><Layers3 size={14}/> {combined?'Explore layers':'Bring it together'}</button><button type="button" className="exploded-reset" onClick={()=>{setAssembled(null);move(0,0);}} aria-label="Reset view and follow scrolling"><RotateCcw size={13}/></button></div><button type="button" aria-pressed={paused} onClick={()=>setPaused(!paused)} disabled={reduced} aria-label={paused?'Enable motion':'Pause motion'}>{paused||reduced?<Play size={13}/>:<Pause size={13}/>}</button><button type="button" className="actual-preview-link" onClick={onExpand}>Actual app <ArrowUpRight size={13}/></button></div>
   </div>;

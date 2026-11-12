@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { DotImage } from '@/components/dot-image';
 import { StudioHero } from '@/components/studio-hero';
 import { useEffect, useRef, useState } from 'react';
 import { capabilities, startupPrograms } from '@/components/home-content';
@@ -79,7 +80,7 @@ export default function HomePage() {
     </section>
     <section className="phone-section wrap" id="mobile-gallery">
       <div className="studio-section-copy"><h2>Check in<br/>from your phone.</h2><p>Pair your phone with Studio to follow conversations, revisit chats, and switch projects. The agent keeps running on your computer.</p><div className="phone-controls" role="group" aria-label="Android screenshots">{['Conversation','Chat history','Projects'].map((label,i)=><button key={label} aria-pressed={phone===i} onClick={()=>setPhone(i)}>{label}<ArrowRight size={14}/></button>)}</div><a className="text-button" href={`${studioLatestDownload}/${androidUniversal.file}`}>Download Android <Download size={15}/></a></div>
-      <div className="phone-stage"><img key={phone} src={['/studio-phone-chat.png','/studio-phone-chats.png','/studio-phone-projects.png'][phone]} alt={['Android agent conversation','Android chat history','Android project list'][phone]} loading="lazy"/></div>
+      <div className="phone-stage"><DotImage key={phone} src={['/studio-phone-chat.png','/studio-phone-chats.png','/studio-phone-projects.png'][phone]} alt={['Android agent conversation','Android chat history','Android project list'][phone]}/></div>
     </section>
     <section className="home-setup wrap" id="studio-downloads"><div className="section-title"><h2>Set up Supercharge.</h2><Link href="/download">All downloads <ArrowUpRight size={15}/></Link></div><div className="setup-columns"><div className="setup-instructions"><h3>01. Install the CLI</h3><p>Start with the agent that powers Studio.</p><InstallCommand/><h3>Connect your model</h3><p>Run <code>/setup</code> to add your key or use a supported browser sign-in.</p><h3>Open your repository</h3><p>Launch Studio and choose a project. Use Agent, Plan, or Ask to start working.</p><Link className="text-button" href="/docs/setup">Setup guide <ArrowRight size={15}/></Link></div><DownloadOptions/></div><details className="server-downloads"><summary>Server downloads <Plus size={17}/></summary><div>{serverDownloads.map(item=><a href={`${studioLatestDownload}/${item.file}`} key={item.file}><span>{item.name}<small>{item.note}</small></span><Download size={16}/></a>)}</div></details></section>
 
