@@ -11,6 +11,7 @@
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
     "postinstall": "fumadocs-mdx",
     "lint": "eslint",
+    "test:seo": "node scripts/check-seo.mjs",
     "test:plugins": "tsx --test tests/plugins/*.test.ts",
     "test:plugins:e2e": "playwright test",
     "plugins:setup": "node scripts/setup-plugin-admin.mjs"

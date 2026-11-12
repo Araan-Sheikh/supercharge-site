@@ -7,6 +7,10 @@ const config = {
   reactStrictMode: true,
   async headers() {
     return [
+      ...['/api/:path*', '/admin/:path*', '/donate/result', '/docs-md/:path*', '/llms-full.txt'].map(source => ({
+        source,
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
+      })),
       {
         source: '/install.ps1',
         headers: [

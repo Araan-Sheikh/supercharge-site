@@ -1,3 +1,5 @@
+import { StructuredData } from '@/components/structured-data';
+import { breadcrumbs, pageMetadata } from '@/lib/seo';
 import { getPageImage, source } from '@/lib/source';
 import {
   DocsBody,
@@ -17,10 +19,15 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   if (!page) notFound();
 
   const MDX = page.data.body;
-  const pageUrl = `/docs/${params.slug?.join('/') || ''}`;
+  const pageUrl = page.url;
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
+      <StructuredData data={breadcrumbs([
+        { name: 'Home', path: '/' },
+        { name: 'Documentation', path: '/docs' },
+        ...(page.url === '/docs' ? [] : [{ name: page.data.title, path: page.url }]),
+      ])} />
       <div className="flex items-start justify-between gap-4 mb-2">
         <DocsTitle>{page.data.title}</DocsTitle>
         <CopyPageButton pageTitle={page.data.title} pageUrl={pageUrl} />
@@ -49,11 +56,10 @@ export async function generateMetadata(
   const page = source.getPage(params.slug);
   if (!page) notFound();
 
-  return {
-    title: page.data.title,
-    description: page.data.description,
-    openGraph: {
-      images: getPageImage(page).url,
-    },
-  };
+  return pageMetadata(
+    page.data.title,
+    page.data.description || `Learn about ${page.data.title} in the Supercharge documentation.`,
+    page.url,
+    getPageImage(page).url,
+  );
 }

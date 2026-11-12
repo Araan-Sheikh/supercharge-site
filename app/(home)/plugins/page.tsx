@@ -1,9 +1,10 @@
+import { pageMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import { catalog } from '@/lib/plugin-platform/store';
 import { PluginCatalog } from '@/components/plugin-catalog';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-export const metadata = {title:'Plugins · Supercharge',description:'Tools and reusable workflows for the Supercharge CLI and desktop app.'};
+export const metadata = pageMetadata('Plugins & Skills', 'Discover MCP tools and reusable skills for the Supercharge CLI and Studio. Extend your AI coding workflow.', '/plugins');
 export default async function PluginsPage(){
   let plugins:Awaited<ReturnType<typeof catalog>>=[]; let unavailable=false;
   try{plugins=await catalog(false);}catch{unavailable=true;}
