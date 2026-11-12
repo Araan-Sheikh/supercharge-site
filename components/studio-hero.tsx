@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { AsciiHeadline } from './ascii-headline';
 import { useRef, useState } from 'react';
 import { ArrowUpRight, X, Monitor, Terminal, Smartphone, Play } from 'lucide-react';
 import { InstallCommand } from './install-command';
@@ -16,7 +17,7 @@ export function StudioHero() {
   return <section className="sc-hero" id="workspace" aria-labelledby="sc-title">
     <div className="sc-hero-grid">
       <div className="sc-intro">
-        <h1 id="sc-title">Start with<br/>your code.</h1>
+        <AsciiHeadline/>
         <p className="sc-description">An AI coding workspace built around your repository. Your agent, terminal, and browser—in one place.</p>
         <div className="sc-actions"><Link href="/download" className="sc-download">Download Studio <ArrowUpRight size={20}/></Link><Link href="/docs/install" className="sc-cli">Install the CLI <ArrowUpRight size={13}/></Link></div>
         <a className="sc-model-note sc-watch" href="#walkthrough"><Play size={13}/> Watch a session <span>↗</span></a>
