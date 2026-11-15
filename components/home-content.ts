@@ -30,5 +30,6 @@ export const startupPrograms: {
   { name: 'Composio', logo: '/badges/composio.svg', note: 'Startup program', href: 'https://composio.dev/startups', wordmark: true },
   { name: 'Exa', logo: '/badges/exa.svg', note: 'Startup program', href: 'https://exa.ai/', wordmark: true },
   { name: 'Linkup', logo: '/badges/linkup.svg', note: 'Web Search API for AI', href: 'https://www.linkup.so/startups', wordmark: true },
+  { name: 'Descope', logo: '/badges/descope.svg', note: 'Startup plan', href: 'https://www.descope.com/for-startups' },
 ];
 

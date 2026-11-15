@@ -83,7 +83,7 @@ export default function HomePage() {
 
     <section className="programs wrap" aria-labelledby="startup-programs">
       <div className="program-heading"><h2 id="startup-programs">Startup programs supporting Supercharge</h2><Link href="/donate">Support the project <ArrowUpRight size={13}/></Link></div>
-      <div className="program-logos">{startupPrograms.map(item => <a href={item.href} key={item.name} aria-label={`${item.name} — ${item.note}`}><img src={item.logo} alt="" className={item.wordmark ? 'wordmark' : ''}/>{!item.wordmark && <strong>{item.name}</strong>}<small>{item.note}</small></a>)}<a href="https://e2b.dev/startups" aria-label="E2B Startup Program"><img className="e2b-badge" src="/e2b/startup_badge-nameplate-outline-white.svg" alt="E2B Startup Program"/></a></div>
+      <div className="program-grid"><div className="program-logos">{startupPrograms.map(item => <a href={item.href} key={item.name} aria-label={`${item.name} — ${item.note}`}><img src={item.logo} alt="" className={item.wordmark ? 'wordmark' : ''}/>{!item.wordmark && <strong>{item.name}</strong>}<small>{item.note}</small></a>)}<a href="https://e2b.dev/startups" aria-label="E2B Startup Program"><img className="e2b-badge" src="/e2b/startup_badge-nameplate-outline-white.svg" alt="E2B Startup Program"/></a><a href="/donate" className="program-cta" aria-label="Add your logo here by sponsoring Supercharge"><strong>Add your logo here</strong><small>by sponsoring Supercharge</small></a></div></div>
     </section>
     <section className="studio-features wrap" aria-label="How Supercharge works">
       {features.map(feature => <article key={feature.title}><h2>{feature.title}</h2><p>{feature.body}</p><Link href={feature.link}>{feature.label}<ArrowRight size={14}/></Link></article>)}

@@ -22,10 +22,16 @@
 .site .exploded-controls button {border-radius:5px;min-height:38px;}
 .site .studio-landing > .programs {padding-block:32px 46px;border-top:1px solid var(--line);}
 .site .program-heading h2,.site .program-heading a {font-size:12px;color:var(--muted);}
-.site .program-logos {gap:0;margin-top:24px;border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+.site .program-grid {margin-top:24px;border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+.site .program-logos {gap:0;margin:0 -1px -1px 0;}
 .site .program-logos a {justify-content:center;align-content:center;min-height:104px;padding:18px 12px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);transition:background .2s;}
-.site .program-logos a:nth-child(4n) {border-right:0;}
-.site .program-logos a:nth-last-child(-n+4) {border-bottom:0;}
+.site .program-logos a:last-child {grid-column:span 3;border-right:0;}
+.site .program-logos a:nth-last-child(2) {border-right:1px solid var(--line);}
+.site .program-logos a.program-cta {border:0;cursor:pointer;}
+.site .program-logos a.program-cta:hover {background:var(--panel);}
+.site .program-logos a.program-cta strong {font-size:17px;font-weight:500;color:var(--muted);transition:color .2s;}
+.site .program-logos a.program-cta:hover strong {color:var(--ink);}
+.site .program-logos a.program-cta small {margin-top:0;}
 .site .program-logos a:hover {background:var(--panel);}
 .site .program-logos small {text-align:center;font-size:10px;margin-top:2px;color:var(--muted);}
 .site .program-logos img {height:25px;}
@@ -94,9 +100,8 @@
   .site .program-heading h2 {max-width:190px;line-height:1.7;}
   .site .program-heading a {font-size:11px;white-space:nowrap;}
   .site .program-logos a {min-height:96px;}
-  .site .program-logos a:nth-child(2n) {border-right:0;}
-  .site .program-logos a:nth-last-child(-n+4) {border-bottom:1px solid var(--line);}
-  .site .program-logos a:nth-last-child(-n+2) {border-bottom:0;}
+  .site .program-logos a:nth-last-child(2) {grid-column:span 2;border-right:0;}
+  .site .program-logos a:last-child {grid-column:span 2;}
   .site .studio-features {padding-block:10px 48px;gap:24px;}
   .site .studio-workflow,.site .phone-section,.site .home-setup,.site .capability-section,.site .studio-faq {padding-block:56px;}
   .site .capability-explorer {grid-template-columns:1fr;}
