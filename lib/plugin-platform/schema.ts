@@ -5,18 +5,18 @@ const envName = z.string().regex(/^[A-Z_][A-Z0-9_]*$/);
 const server = z.object({
   url: z.string().url().optional(), command: z.string().min(1).max(512).optional(),
   args: z.array(z.string().max(2048)).max(100).optional(),
-  env: z.record(z.string().max(2048)).optional(),
-  headers: z.record(z.string().max(2048)).optional(),
+  env: z.record(z.string(), z.string().max(2048)).optional(),
+  headers: z.record(z.string(), z.string().max(2048)).optional(),
   bearer_token_env_var: envName.optional(),
   oauth: z.object({ clientId: z.string().min(1).max(512).optional(), clientSecretEnvVar: envName.optional(), scopes: z.array(z.string().max(200)).max(40).optional(), callbackPort: z.number().int().min(1).max(65535).optional() }).strict().optional(),
 }).strict().superRefine((s, ctx) => {
   if (!!s.url === !!s.command) ctx.addIssue({ code: 'custom', message: 'Each MCP server needs exactly one URL or command' });
   if (s.url) { const u = new URL(s.url); if (u.protocol !== 'https:' || u.username || u.password || u.search || u.hash) ctx.addIssue({ code: 'custom', message: 'MCP URLs must be HTTPS without credentials, query or fragment' }); }
   for (const [k, v] of Object.entries(s.headers ?? {})) {
-    if (/authorization|api[-_]?key|token|secret|cookie/i.test(k) && !/^\$\{[A-Z_][A-Z0-9_]*\}$/.test(v)) ctx.addIssue({ code: 'custom', message: 'Secret headers must reference ${ENVIRONMENT_VARIABLE}; never paste credentials into a plugin' });
+    if (/authorization|api[-_]?key|token|secret|cookie/i.test(k) && !/^\$\{[A-Z_][A-Z0-9_]*\}$/.test(String(v))) ctx.addIssue({ code: 'custom', message: 'Secret headers must reference ${ENVIRONMENT_VARIABLE}; never paste credentials into a plugin' });
   }
   for (const [k, v] of Object.entries(s.env ?? {})) {
-    if (/key|token|secret|password|credential/i.test(k) && !/^\$\{[A-Z_][A-Z0-9_]*\}$/.test(v)) ctx.addIssue({ code: 'custom', message: 'Secret environment values must reference ${ENVIRONMENT_VARIABLE}' });
+    if (/key|token|secret|password|credential/i.test(k) && !/^\$\{[A-Z_][A-Z0-9_]*\}$/.test(String(v))) ctx.addIssue({ code: 'custom', message: 'Secret environment values must reference ${ENVIRONMENT_VARIABLE}' });
   }
 });
 export const pluginDocument = z.object({

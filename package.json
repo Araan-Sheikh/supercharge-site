@@ -41,7 +41,7 @@
     "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.4.0",
     "ws": "^8.22.0",
-    "zod": "^3.25.76"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
@@ -58,6 +58,7 @@
     "tailwindcss": "^4.1.17",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.2",
     "vite": "^7.2.7"
   }
 }
