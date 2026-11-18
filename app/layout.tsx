@@ -8,6 +8,9 @@ import './dark-theme.css';
 import './landing-polish.css';
 import './dot-art.css';
 import './landing-motion.css';
+import './landing-sections.css';
+import './launch.css';
+import './refinement.css';
 import { Inter } from 'next/font/google';
 
 

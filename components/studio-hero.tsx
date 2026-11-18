@@ -1,37 +1,47 @@
 'use client';
-
 import Link from 'next/link';
-import { AsciiHeadline } from './ascii-headline';
-import { useRef, useState } from 'react';
-import { ArrowUpRight, X, Monitor, Terminal, Smartphone, Play } from 'lucide-react';
-import { InstallCommand } from './install-command';
-import { ExplodedStudio } from './exploded-studio';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowRight, Download, Pause, Play, X, Monitor, Terminal, Smartphone } from 'lucide-react';
 
-const surfaces = ['Desktop', 'Terminal', 'Android'] as const;
-const surfaceIcons = [Monitor, Terminal, Smartphone];
+const surfaces = [
+  {name:'Studio',icon:Monitor,src:'/studio-desktop.png',alt:'Supercharge Studio with project sidebar, agent conversation, terminal and browser',note:'The full workspace. Agent, terminal, and browser together.',link:'/download',label:'Download Studio'},
+  {name:'CLI',icon:Terminal,src:'/walkthrough-poster.webp',alt:'Actual Supercharge terminal session exploring a codebase',note:'Start in a repository. Work directly from your terminal.',link:'/docs/install',label:'Install the CLI'},
+  {name:'Android',icon:Smartphone,src:'/studio-phone-chat.png',alt:'Actual Supercharge Android conversation',note:'Pair with Studio on your computer and follow the conversation.',link:'/download#mobile',label:'Get Android'},
+];
 export function StudioHero() {
-  const [active, setActive] = useState(0);
+  const root = useRef<HTMLElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
-  const tabs = useRef<(HTMLButtonElement | null)[]>([]);
-  const choose = (index: number) => { setActive(index); tabs.current[index]?.focus(); };
-  return <section className="sc-hero" id="workspace" aria-labelledby="sc-title">
-    <div className="sc-hero-grid">
-      <div className="sc-intro">
-        <AsciiHeadline/>
-        <p className="sc-description">An AI coding workspace built around your repository. Your agent, terminal, and browser—in one place.</p>
-        <div className="sc-actions"><Link href="/download" className="sc-download">Download Studio <ArrowUpRight size={20}/></Link><Link href="/docs/install" className="sc-cli">Install the CLI <ArrowUpRight size={13}/></Link></div>
-        <a className="sc-model-note sc-watch" href="#walkthrough"><Play size={13}/> Watch a session <span>↗</span></a>
-        <p className="sc-platform-note">Free to use · Bring your own model<small>macOS, Windows & Linux</small><small>Your provider’s usage charges may apply.</small></p>
-      </div>
-      <div className={`sc-product ${active === 0 ? 'sc-product-3d' : ''}`}>
-        <div className={`sc-panel ${active === 0 ? 'sc-panel-3d' : ''}`} id={`sc-panel-${active}`} role="tabpanel" aria-labelledby={`sc-tab-${active}`} tabIndex={0}>
-          {active === 0 && <ExplodedStudio onExpand={()=>dialog.current?.showModal()}/>}
-          {active === 1 && <div className="sc-terminal-view"><div className="sc-window-caption"><span>supercharge / terminal</span><span>CLI</span></div><pre><span>$</span> cd my-project{'\n'}<span>$</span> supercharge</pre><h2>Work from your terminal.</h2><p>Connect a provider with <code>/setup</code>, then ask the agent to work in your repository.</p><InstallCommand/><Link href="/docs/commands">Browse commands <ArrowUpRight size={14}/></Link></div>}
-          {active === 2 && <div className="sc-phone-view"><div><span className="sc-window-caption">STUDIO / ANDROID</span><h2>Take the<br/>conversation<br/>with you.</h2><p>Pair with Studio on your computer to follow the agent from your phone.</p><Link href="/download#mobile">Get the Android app <ArrowUpRight size={15}/></Link></div><img src="/studio-phone-chat.png" width="420" height="850" alt="Actual Supercharge Android conversation"/></div>}
+  const opener = useRef<HTMLButtonElement>(null);
+  const [surface, setSurface] = useState(0);
+  const surfaceTabs = useRef<(HTMLButtonElement|null)[]>([]);
+  const current = surfaces[surface];
+  const [paused, setPaused] = useState(false);
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => { if(root.current) root.current.dataset.visible = String(entry.isIntersecting); });
+    if(root.current) observer.observe(root.current);
+    return () => observer.disconnect();
+  }, []);
+  return <section ref={root} className="launch-hero" id="workspace" aria-labelledby="sc-title" data-paused={paused}>
+    <div className="launch-intro">
+      <span className="launch-eyebrow">SUPERCHARGE STUDIO + CLI</span>
+      <h1 id="sc-title">From your first prompt<br/>to your next commit.</h1>
+      <p>An AI coding workspace for your repository.<br/>Your agent, terminal, and browser—all together.</p>
+      <div className="launch-actions"><Link href="/download"><Download size={17}/>Download Studio</Link><Link href="/docs/install">Explore the CLI <ArrowRight size={17}/></Link></div>
+      <span className="launch-platforms">macOS, Windows & Linux · Free to use · Bring your own model</span>
+    </div>
+    <div className="launch-scene" onPointerMove={event=>{if(paused || event.pointerType==='touch' || matchMedia('(prefers-reduced-motion: reduce)').matches)return;const r=event.currentTarget.getBoundingClientRect();event.currentTarget.style.setProperty('--tilt',`${((event.clientX-r.left)/r.width-.5)*3}deg`);}} onPointerLeave={event=>event.currentTarget.style.setProperty('--tilt','0deg')}>
+
+      <div className="orbital-form form-blue" aria-hidden="true"/><div className="orbital-form form-violet" aria-hidden="true"/><div className="orbital-form form-silver" aria-hidden="true"/>
+      <div className="launch-mascot" aria-hidden="true"><span/><img src="/logo.png" width="120" height="120" alt=""/></div>
+      <div className="launch-product-preview">
+        <div className="preview-tabs" role="tablist" aria-label="Explore product surfaces" onKeyDown={e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const next=e.key==='Home'?0:e.key==='End'?2:(surface+(e.key==='ArrowRight'?1:2))%3;setSurface(next);surfaceTabs.current[next]?.focus();}}>{surfaces.map((item,i)=><button type="button" key={item.name} ref={n=>{surfaceTabs.current[i]=n;}} role="tab" id={`preview-tab-${i}`} aria-selected={surface===i} aria-controls="preview-panel" tabIndex={surface===i?0:-1} onClick={()=>setSurface(i)}><item.icon size={15}/>{item.name}</button>)}</div>
+        <div id="preview-panel" role="tabpanel" aria-labelledby={`preview-tab-${surface}`}>
+          <button ref={opener} type="button" className={`launch-window preview-surface-${surface}`} onClick={()=>dialog.current?.showModal()} aria-label={`Enlarge ${current.name} screenshot`}><span className="launch-window-bar"><span>● ● ●</span><span>Supercharge / {current.name}</span><span>View full size ↗</span></span><span className="preview-image-area"><img src={current.src} width={surface===2?420:1920} height={surface===2?850:1044} alt={current.alt} fetchPriority={surface===0?'high':'auto'}/>{surface===2&&<span className="preview-phone-note"><Smartphone size={28}/><strong>Your workspace,<br/>within reach.</strong><span>Conversations · History · Projects</span></span>}</span></button>
+          <div className="launch-preview-caption"><span>{current.note}</span><Link href={current.link}>{current.label} <ArrowRight size={14}/></Link></div>
         </div>
       </div>
     </div>
-    <div className="sc-switcher" role="tablist" aria-label="Explore Supercharge on your devices" onKeyDown={event=>{const keys=['ArrowRight','ArrowLeft','Home','End'];if(!keys.includes(event.key))return;event.preventDefault();choose(event.key==='Home'?0:event.key==='End'?2:(active+(event.key==='ArrowRight'?1:2))%3);}}>{surfaces.map((label,index)=><button type="button" key={label} ref={node=>{tabs.current[index]=node;}} id={`sc-tab-${index}`} role="tab" aria-selected={active===index} aria-controls={`sc-panel-${index}`} tabIndex={active===index?0:-1} onClick={()=>setActive(index)}>{(() => { const Icon = surfaceIcons[index]; return <Icon size={16} aria-hidden="true"/>; })()}{label}</button>)}</div>
-    <dialog ref={dialog} className="sc-image-dialog" aria-label="Full Supercharge Studio screenshot" onClose={()=>tabs.current[active]?.focus()} onClick={event=>{if(event.target===event.currentTarget)dialog.current?.close();}}><div><button type="button" autoFocus onClick={()=>dialog.current?.close()} aria-label="Close screenshot"><X size={22}/></button><img src="/studio-desktop.png" width="1920" height="1044" alt="Full Supercharge Studio screenshot, including project sidebar, agent conversation and browser panel"/><p>Supercharge Studio · Actual interface</p></div></dialog>
+    <div className="launch-under"><a href="#walkthrough">Watch a real session <Play size={12}/></a><button type="button" aria-pressed={paused} onClick={()=>setPaused(!paused)}>{paused?<Play size={13}/>:<Pause size={13}/>}<span>{paused?'Resume motion':'Pause motion'}</span></button></div>
+    <dialog ref={dialog} className="sc-image-dialog" aria-label={`Full ${current.name} screenshot`} onClose={()=>opener.current?.focus()} onClick={event=>{if(event.target===event.currentTarget)dialog.current?.close();}}><div><button type="button" autoFocus onClick={()=>dialog.current?.close()} aria-label="Close screenshot"><X size={22}/></button><img src={current.src} width={surface===2?420:1920} height={surface===2?850:1044} alt={current.alt}/></div></dialog>
   </section>;
 }

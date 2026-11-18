@@ -1,12 +1,18 @@
 'use client';
 
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Pause, Play } from 'lucide-react';
 
 export function BoostArt() {
   const id = useId().replace(/:/g, '');
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => { if (root.current) root.current.dataset.visible = String(entry.isIntersecting); });
+    if (root.current) observer.observe(root.current);
+    return () => observer.disconnect();
+  }, []);
   const [paused, setPaused] = useState(false);
-  return <div className="boost-art" data-paused={paused}>
+  return <div ref={root} className="boost-art" data-paused={paused}>
     <svg viewBox="0 0 1200 200" role="img" aria-label="Supercharge, in illuminated dot-matrix lettering">
       <defs>
         <pattern id={`${id}-dots`} width="5" height="5" patternUnits="userSpaceOnUse"><circle cx="2.5" cy="2.5" r="1.65" fill="white"/></pattern>
